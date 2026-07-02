@@ -23,7 +23,7 @@
 
 | 供应商 | 主打模型 | 上下文 | 特点 | 推荐场景 |
 |--------|---------|--------|------|---------|
-| **智谱 GLM** | glm-5.1 / glm-4.7 | 长上下文 | 国产旗舰、Coding 强 | 通用全栈开发 |
+| **智谱 GLM** | glm-5.2[1m] / glm-5.1 | 1M | 当前国产最强 Coding 模型（对标 Claude Sonnet 4.6） | 大型项目 / Agent 编程首选 |
 | **DeepSeek** | deepseek-v4-pro / flash | 1M | 极致性价比、代码能力顶级 | 大批量代码生成、Ralph 循环 |
 | **Kimi** | kimi-k2.6 | 超长上下文 | 长文档 & 大 codebase 无压力 | 大型项目重构、文档整合 |
 | **小米 MiMo** | mimo-v2.5-pro / v2.5 | 中长 | 小米生态整合 | 端云一体开发 |
@@ -79,36 +79,76 @@ claude --permission-mode bypassPermissions
 
 ---
 
-### 2️⃣ 智谱 GLM（国产旗舰 · Coding 能力扎实）
+### 2️⃣ 智谱 GLM（国产旗舰 · Coding 能力最强 · 1M 上下文）
 
-**申请 Key**：<https://open.bigmodel.cn/>
+**申请 Key**：
+- 🇨🇳 境内入口：<https://open.bigmodel.cn/>（bigmodel MaaS 平台，支持 GLM Coding Plan 订阅）
+- 🌏 海外入口：<https://z.ai/>（z.ai 是智谱海外站，包含 Coding Plan 页 `https://z.ai/subscribe`）
 
-**Linux / macOS**：
+**最新旗舰模型**：`glm-5.2[1m]`（1M 上下文，Coding 能力对标 Claude Sonnet 4.6，是当前国产最强 coding 模型喵～）。
+辅助快速模型：`glm-5.1`（可用于低延迟摘要 / 快问快答）。
+
+**⚠️ 重要**：要真正启用 GLM 5.2 的 **1M 上下文**，模型名必须带 `[1m]` 后缀，同时设置 `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000`，否则 Claude Code 会用默认压缩窗口，等于白开长上下文喵。
+
+#### 方式 A · 环境变量（Codespace / 临时会话推荐）
+
+**Linux / macOS / Codespace**：
 ```bash
-export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+export ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
 export ANTHROPIC_AUTH_TOKEN=your-API-key
-export ANTHROPIC_MODEL=glm-5.1
-export ANTHROPIC_SMALL_FAST_MODEL=glm-4.7
+export ANTHROPIC_MODEL="glm-5.2[1m]"
+export ANTHROPIC_SMALL_FAST_MODEL=glm-5.1
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
+export API_TIMEOUT_MS=3000000
 claude --permission-mode bypassPermissions
 ```
 
 **Windows PowerShell**：
 ```powershell
-$env:ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
+$env:ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
 $env:ANTHROPIC_AUTH_TOKEN="your-API-key"
-$env:ANTHROPIC_MODEL="glm-5.1"
-$env:ANTHROPIC_SMALL_FAST_MODEL="glm-4.7"
+$env:ANTHROPIC_MODEL="glm-5.2[1m]"
+$env:ANTHROPIC_SMALL_FAST_MODEL="glm-5.1"
+$env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
+$env:API_TIMEOUT_MS="3000000"
 claude --permission-mode bypassPermissions
 ```
 
 **Windows CMD**：
 ```cmd
-set ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+set ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
 set ANTHROPIC_AUTH_TOKEN=your-API-key
-set ANTHROPIC_MODEL=glm-5.1
-set ANTHROPIC_SMALL_FAST_MODEL=glm-4.7
+set ANTHROPIC_MODEL=glm-5.2[1m]
+set ANTHROPIC_SMALL_FAST_MODEL=glm-5.1
+set CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
+set API_TIMEOUT_MS=3000000
 claude --permission-mode bypassPermissions
 ```
+
+#### 方式 B · `~/.claude/settings.json`（Claude Code 官方推荐 · 持久生效）
+
+编辑 `~/.claude/settings.json`（不存在就新建），加入：
+
+```json
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "your-API-key",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "1000000",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "glm-5.1",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.2[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.2[1m]"
+  }
+}
+```
+
+保存后重开 `claude` 即可生效。在 Claude Code 里输 `/status` 可以看到实际调用的是 GLM。想切换推理力度用 `/effort`。
+
+> 📌 **官方文档**：<https://docs.z.ai/devpack/tool/claude>（含最新模型清单、切换指南、GLM Coding Plan 计费说明）。
+>
+> 💡 **境内 vs 海外端点**：`api.z.ai/api/anthropic` 是当前官方文档主推端点，境内境外都能访问；老的 `open.bigmodel.cn/api/anthropic` 端点仍可用，但新特性（如 5.2、1M 上下文的 mapping）以 z.ai 文档为准。境内用户如果 z.ai 访问慢，可以试用 bigmodel 端点。
+
 
 ---
 
@@ -265,10 +305,11 @@ notepad $PROFILE
 在文件里加：
 ```powershell
 # ============ CodeForge · GLM ============
-$env:ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
+$env:ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
 $env:ANTHROPIC_AUTH_TOKEN="your-API-key"
-$env:ANTHROPIC_MODEL="glm-5.1"
-$env:ANTHROPIC_SMALL_FAST_MODEL="glm-4.7"
+$env:ANTHROPIC_MODEL="glm-5.2[1m]"
+$env:ANTHROPIC_SMALL_FAST_MODEL="glm-5.1"
+$env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
 ```
 
 保存后重开 PowerShell 生效。
@@ -294,11 +335,12 @@ cf-deepseek() {
   echo "✅ Claude Code switched to DeepSeek"
 }
 cf-glm() {
-  export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+  export ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
   export ANTHROPIC_AUTH_TOKEN=$GLM_KEY
-  export ANTHROPIC_MODEL=glm-5.1
-  export ANTHROPIC_SMALL_FAST_MODEL=glm-4.7
-  echo "✅ Claude Code switched to GLM"
+  export ANTHROPIC_MODEL="glm-5.2[1m]"
+  export ANTHROPIC_SMALL_FAST_MODEL=glm-5.1
+  export CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
+  echo "✅ Claude Code switched to GLM 5.2 (1M ctx)"
 }
 cf-kimi() {
   export ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
@@ -324,11 +366,12 @@ function cf-deepseek {
   Write-Host "✅ Claude Code switched to DeepSeek" -ForegroundColor Green
 }
 function cf-glm {
-  $env:ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
+  $env:ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
   $env:ANTHROPIC_AUTH_TOKEN=$env:GLM_KEY
-  $env:ANTHROPIC_MODEL="glm-5.1"
-  $env:ANTHROPIC_SMALL_FAST_MODEL="glm-4.7"
-  Write-Host "✅ Claude Code switched to GLM" -ForegroundColor Green
+  $env:ANTHROPIC_MODEL="glm-5.2[1m]"
+  $env:ANTHROPIC_SMALL_FAST_MODEL="glm-5.1"
+  $env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
+  Write-Host "✅ Claude Code switched to GLM 5.2 (1M ctx)" -ForegroundColor Green
 }
 ```
 
@@ -369,7 +412,7 @@ claude --permission-mode bypassPermissions
 **A**: 供应商的模型名可能更新过，去对应文档查最新的模型 ID。或者尝试去掉 `[1m]` 上下文后缀。
 
 ### Q4: 想用 CodeForge 的 skill 但不确定国产模型能否驱动？
-**A**: CodeForge 的所有 skill 是 **prompt 层配置**，与底层模型解耦。任何 Claude API 兼容供应商都能跑。**实测**：DeepSeek-V4-Pro、GLM-5.1、Kimi-K2.6 都能顺畅跑 `/ai-spec` `/deep-research` `/api-first` 全流程。
+**A**: CodeForge 的所有 skill 是 **prompt 层配置**，与底层模型解耦。任何 Claude API 兼容供应商都能跑。**实测**：DeepSeek-V4-Pro、GLM-5.2[1m]、Kimi-K2.6 都能顺畅跑 `/ai-spec` `/deep-research` `/api-first` 全流程。
 
 ### Q5: `--permission-mode bypassPermissions` 是啥？安全吗？
 **A**: Claude Code 的一个启动 flag，跳过多数交互确认。**CodeForge 内部的 skill 已内置人在回路约束**（commit/push 前必须人工授权），所以 bypass 对 CodeForge 工作流影响不大。若你在通用场景需要更严格的每步确认，去掉该 flag 用默认交互模式即可。
@@ -399,7 +442,7 @@ claude --permission-mode bypassPermissions
 | 供应商 | 输入 | 输出 | 备注 |
 |--------|------|------|------|
 | DeepSeek V4 Pro | ~¥1/M tokens | ~¥8/M tokens | 极致性价比，Ralph 循环首选 |
-| GLM-5.1 | ~¥5/M tokens | ~¥15/M tokens | 均衡 |
+| GLM-5.2[1m] (Coding Plan) | 起步 ~¥20/月 订阅 | 起步 ~¥20/月 订阅 | 1M 上下文，性价比之王 |
 | Kimi K2.6 | ~¥8/M tokens | ~¥30/M tokens | 长上下文更贵 |
 | Claude Opus 4 (中转) | ~¥20/M tokens | ~¥100/M tokens | 顶级质量 |
 
