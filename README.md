@@ -178,7 +178,7 @@ npm install -g @google/gemini-cli && gemini
 >
 > 完整六家供应商配置模板（bash / PowerShell / CMD 全平台）、`settings.json` 官方推荐方案、持久化技巧、一键切换函数、成本对照 → 📖 **[docs/cn-api-providers.md](./docs/cn-api-providers.md)**
 >
-> ✅ 已实测：GLM-5.2[1m] / DeepSeek-V4-Pro / Kimi-K2.6 均可顺畅驱动 CodeForge 全流程 skill。**很多模型支持 1M 上下文，`[1m]` 后缀不要忘记加**。
+> ✅ 已实测：GLM-5.2[1m] / DeepSeek-V4-Pro / Kimi-K2.7-Code / 小米 MiMo v2.5-pro[1m] 均可顺畅驱动 CodeForge 全流程 skill。**很多模型支持 1M 上下文，`[1m]` 后缀不要忘记加**（GLM/MiMo/DeepSeek 都是），Kimi K2.7-Code 是 256K，需要匹配 `CLAUDE_CODE_AUTO_COMPACT_WINDOW=262144`。
 
 ---
 

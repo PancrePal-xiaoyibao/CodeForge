@@ -25,8 +25,8 @@
 |--------|---------|--------|------|---------|
 | **智谱 GLM** | glm-5.2[1m] / glm-5.1 | 1M | 当前国产最强 Coding 模型（对标 Claude Sonnet 4.6） | 大型项目 / Agent 编程首选 |
 | **DeepSeek** | deepseek-v4-pro / flash | 1M | 极致性价比、代码能力顶级 | 大批量代码生成、Ralph 循环 |
-| **Kimi** | kimi-k2.6 | 超长上下文 | 长文档 & 大 codebase 无压力 | 大型项目重构、文档整合 |
-| **小米 MiMo** | mimo-v2.5-pro / v2.5 | 中长 | 小米生态整合 | 端云一体开发 |
+| **Kimi K2.7-Code** | kimi-k2.7-code | 256K | 开源 1T MoE，30% 更少思考 token，$0.95/$4/M | 长循环 Agent 编程 |
+| **小米 MiMo** | mimo-v2.5-pro[1m] / v2.5[1m] | 1M | 小米生态整合，1M 上下文 | 端云一体开发 |
 | **硅基流动** | 多家聚合 | 视模型 | 一个 Key 通多家 | 试模型、切换成本低 |
 | **中转 Claude** | claude-opus-4-6 / sonnet-4-6 | 1M | 原厂能力 | 品质优先、预算充足 |
 
@@ -152,49 +152,79 @@ claude --permission-mode bypassPermissions
 
 ---
 
-### 3️⃣ Kimi（Moonshot · 超长上下文杀器）
+### 3️⃣ Kimi K2.7-Code（Moonshot · 开源 1T MoE Coding 模型）
 
-**申请 Key**：<https://platform.moonshot.cn/>
+**申请 Key**：
+- 🇨🇳 境内入口：<https://kimi.com/>（Kimi Code 平台，Coding 专用 Key）
+- 官方文档：<https://platform.kimi.ai/docs/guide/agent-support>
 
-**Linux / macOS**：
+**最新旗舰模型**：`kimi-k2.7-code`（2026-06-12 发布，1T 总参数 / 32B 激活的 MoE Coding 模型，**256K 上下文**，思考 token 比 K2.6 减少约 30%，在 MCP Mark Verified 上得分 81.1，超过 Claude Opus 4.8 的 76.4）。
+
+**⚠️ 端点变更**：老的 `api.moonshot.cn/anthropic` 端点在 Kimi Code 平台的 `sk-kimi-` Key 下会返回 401，请使用新端点 **`https://api.kimi.com/coding/`**。上下文窗口 256K（262144），需要匹配 `CLAUDE_CODE_AUTO_COMPACT_WINDOW=262144`。
+
+**Linux / macOS / Codespace**：
 ```bash
-export ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
-export ANTHROPIC_AUTH_TOKEN=your-API-key
-export ANTHROPIC_MODEL=kimi-k2.6
-export ANTHROPIC_SMALL_FAST_MODEL=kimi-k2-0905-preview
+export ANTHROPIC_BASE_URL=https://api.kimi.com/coding/
+export ANTHROPIC_AUTH_TOKEN=your-kimi-API-key
+export ANTHROPIC_MODEL=kimi-k2.7-code
+export ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2.7-code
+export ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2.7-code
+export ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2.7-code
+export CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2.7-code
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW=262144
+export ENABLE_TOOL_SEARCH=false
 claude --permission-mode bypassPermissions
 ```
 
 **Windows PowerShell**：
 ```powershell
-$env:ANTHROPIC_BASE_URL="https://api.moonshot.cn/anthropic"
-$env:ANTHROPIC_AUTH_TOKEN="your-API-key"
-$env:ANTHROPIC_MODEL="kimi-k2.6"
-$env:ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-0905-preview"
+$env:ANTHROPIC_BASE_URL="https://api.kimi.com/coding/"
+$env:ANTHROPIC_AUTH_TOKEN="your-kimi-API-key"
+$env:ANTHROPIC_MODEL="kimi-k2.7-code"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL="kimi-k2.7-code"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL="kimi-k2.7-code"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL="kimi-k2.7-code"
+$env:CLAUDE_CODE_SUBAGENT_MODEL="kimi-k2.7-code"
+$env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="262144"
+$env:ENABLE_TOOL_SEARCH="false"
 claude --permission-mode bypassPermissions
 ```
 
 **Windows CMD**：
 ```cmd
-set ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
-set ANTHROPIC_AUTH_TOKEN=your-API-key
-set ANTHROPIC_MODEL=kimi-k2.6
-set ANTHROPIC_SMALL_FAST_MODEL=kimi-k2-0905-preview
+set ANTHROPIC_BASE_URL=https://api.kimi.com/coding/
+set ANTHROPIC_AUTH_TOKEN=your-kimi-API-key
+set ANTHROPIC_MODEL=kimi-k2.7-code
+set ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2.7-code
+set ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2.7-code
+set ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2.7-code
+set CLAUDE_CODE_SUBAGENT_MODEL=kimi-k2.7-code
+set CLAUDE_CODE_AUTO_COMPACT_WINDOW=262144
+set ENABLE_TOOL_SEARCH=false
 claude --permission-mode bypassPermissions
 ```
 
+> 📌 **官方 Anthropic 兼容说明**：<https://platform.kimi.ai/docs/guide/agent-support>
+>
+> 💡 K2.7-Code 上下文是 **256K 而不是 1M**，但通过 30% 更低的思考 token + $0.95/$4.00 per M tokens 的极低单价，在长循环 Agent 任务里性价比依然突出。
+
 ---
 
-### 4️⃣ 小米 MiMo（Xiaomi）
+### 4️⃣ 小米 MiMo v2.5 · 1M 上下文（Xiaomi）
 
 **申请 Key**：见小米开放平台文档。
 
-**Linux / macOS**：
+**最新模型**：`mimo-v2.5-pro[1m]` / `mimo-v2.5[1m]`（**1M 上下文**，模型名带 `[1m]` 后缀才能真正启用长上下文）。
+
+**⚠️ 重要**：和 GLM 一样，1M 上下文需要 `CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000`。
+
+**Linux / macOS / Codespace**：
 ```bash
 export ANTHROPIC_BASE_URL=https://token-plan-cn.xiaomimimo.com/anthropic
 export ANTHROPIC_AUTH_TOKEN=your-API-key
-export ANTHROPIC_MODEL=mimo-v2.5-pro
-export ANTHROPIC_SMALL_FAST_MODEL=mimo-v2.5
+export ANTHROPIC_MODEL="mimo-v2.5-pro[1m]"
+export ANTHROPIC_SMALL_FAST_MODEL="mimo-v2.5[1m]"
+export CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
 claude --permission-mode bypassPermissions
 ```
 
@@ -202,8 +232,9 @@ claude --permission-mode bypassPermissions
 ```powershell
 $env:ANTHROPIC_BASE_URL="https://token-plan-cn.xiaomimimo.com/anthropic"
 $env:ANTHROPIC_AUTH_TOKEN="your-API-key"
-$env:ANTHROPIC_MODEL="mimo-v2.5-pro"
-$env:ANTHROPIC_SMALL_FAST_MODEL="mimo-v2.5"
+$env:ANTHROPIC_MODEL="mimo-v2.5-pro[1m]"
+$env:ANTHROPIC_SMALL_FAST_MODEL="mimo-v2.5[1m]"
+$env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
 claude --permission-mode bypassPermissions
 ```
 
@@ -211,8 +242,9 @@ claude --permission-mode bypassPermissions
 ```cmd
 set ANTHROPIC_BASE_URL=https://token-plan-cn.xiaomimimo.com/anthropic
 set ANTHROPIC_AUTH_TOKEN=your-API-key
-set ANTHROPIC_MODEL=mimo-v2.5-pro
-set ANTHROPIC_SMALL_FAST_MODEL=mimo-v2.5
+set ANTHROPIC_MODEL=mimo-v2.5-pro[1m]
+set ANTHROPIC_SMALL_FAST_MODEL=mimo-v2.5[1m]
+set CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
 claude --permission-mode bypassPermissions
 ```
 
@@ -343,15 +375,27 @@ cf-glm() {
   echo "✅ Claude Code switched to GLM 5.2 (1M ctx)"
 }
 cf-kimi() {
-  export ANTHROPIC_BASE_URL=https://api.moonshot.cn/anthropic
+  export ANTHROPIC_BASE_URL=https://api.kimi.com/coding/
   export ANTHROPIC_AUTH_TOKEN=$KIMI_KEY
-  export ANTHROPIC_MODEL=kimi-k2.6
-  export ANTHROPIC_SMALL_FAST_MODEL=kimi-k2-0905-preview
-  echo "✅ Claude Code switched to Kimi"
+  export ANTHROPIC_MODEL=kimi-k2.7-code
+  export ANTHROPIC_DEFAULT_OPUS_MODEL=kimi-k2.7-code
+  export ANTHROPIC_DEFAULT_SONNET_MODEL=kimi-k2.7-code
+  export ANTHROPIC_DEFAULT_HAIKU_MODEL=kimi-k2.7-code
+  export CLAUDE_CODE_AUTO_COMPACT_WINDOW=262144
+  export ENABLE_TOOL_SEARCH=false
+  echo "✅ Claude Code switched to Kimi K2.7-Code (256K ctx)"
+}
+cf-mimo() {
+  export ANTHROPIC_BASE_URL=https://token-plan-cn.xiaomimimo.com/anthropic
+  export ANTHROPIC_AUTH_TOKEN=$MIMO_KEY
+  export ANTHROPIC_MODEL="mimo-v2.5-pro[1m]"
+  export ANTHROPIC_SMALL_FAST_MODEL="mimo-v2.5[1m]"
+  export CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000
+  echo "✅ Claude Code switched to Xiaomi MiMo v2.5 (1M ctx)"
 }
 ```
 
-再把 `DEEPSEEK_KEY` / `GLM_KEY` / `KIMI_KEY` 放到 `~/.bashrc` 或专门的 `~/.secrets.env` 里（**记得 chmod 600 并加入 .gitignore**）。
+再把 `DEEPSEEK_KEY` / `GLM_KEY` / `KIMI_KEY` / `MIMO_KEY` 放到 `~/.bashrc` 或专门的 `~/.secrets.env` 里（**记得 chmod 600 并加入 .gitignore**）。
 
 用起来：`cf-deepseek && claude` 或 `cf-glm && claude`。
 
@@ -372,6 +416,25 @@ function cf-glm {
   $env:ANTHROPIC_SMALL_FAST_MODEL="glm-5.1"
   $env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
   Write-Host "✅ Claude Code switched to GLM 5.2 (1M ctx)" -ForegroundColor Green
+}
+function cf-kimi {
+  $env:ANTHROPIC_BASE_URL="https://api.kimi.com/coding/"
+  $env:ANTHROPIC_AUTH_TOKEN=$env:KIMI_KEY
+  $env:ANTHROPIC_MODEL="kimi-k2.7-code"
+  $env:ANTHROPIC_DEFAULT_OPUS_MODEL="kimi-k2.7-code"
+  $env:ANTHROPIC_DEFAULT_SONNET_MODEL="kimi-k2.7-code"
+  $env:ANTHROPIC_DEFAULT_HAIKU_MODEL="kimi-k2.7-code"
+  $env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="262144"
+  $env:ENABLE_TOOL_SEARCH="false"
+  Write-Host "✅ Claude Code switched to Kimi K2.7-Code (256K ctx)" -ForegroundColor Green
+}
+function cf-mimo {
+  $env:ANTHROPIC_BASE_URL="https://token-plan-cn.xiaomimimo.com/anthropic"
+  $env:ANTHROPIC_AUTH_TOKEN=$env:MIMO_KEY
+  $env:ANTHROPIC_MODEL="mimo-v2.5-pro[1m]"
+  $env:ANTHROPIC_SMALL_FAST_MODEL="mimo-v2.5[1m]"
+  $env:CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
+  Write-Host "✅ Claude Code switched to Xiaomi MiMo v2.5 (1M ctx)" -ForegroundColor Green
 }
 ```
 
@@ -412,7 +475,7 @@ claude --permission-mode bypassPermissions
 **A**: 供应商的模型名可能更新过，去对应文档查最新的模型 ID。或者尝试去掉 `[1m]` 上下文后缀。
 
 ### Q4: 想用 CodeForge 的 skill 但不确定国产模型能否驱动？
-**A**: CodeForge 的所有 skill 是 **prompt 层配置**，与底层模型解耦。任何 Claude API 兼容供应商都能跑。**实测**：DeepSeek-V4-Pro、GLM-5.2[1m]、Kimi-K2.6 都能顺畅跑 `/ai-spec` `/deep-research` `/api-first` 全流程。
+**A**: CodeForge 的所有 skill 是 **prompt 层配置**，与底层模型解耦。任何 Claude API 兼容供应商都能跑。**实测**：DeepSeek-V4-Pro、GLM-5.2[1m]、Kimi-K2.7-Code、小米 MiMo v2.5-pro[1m] 都能顺畅跑 `/ai-spec` `/deep-research` `/api-first` 全流程。
 
 ### Q5: `--permission-mode bypassPermissions` 是啥？安全吗？
 **A**: Claude Code 的一个启动 flag，跳过多数交互确认。**CodeForge 内部的 skill 已内置人在回路约束**（commit/push 前必须人工授权），所以 bypass 对 CodeForge 工作流影响不大。若你在通用场景需要更严格的每步确认，去掉该 flag 用默认交互模式即可。
@@ -443,7 +506,8 @@ claude --permission-mode bypassPermissions
 |--------|------|------|------|
 | DeepSeek V4 Pro | ~¥1/M tokens | ~¥8/M tokens | 极致性价比，Ralph 循环首选 |
 | GLM-5.2[1m] (Coding Plan) | 起步 ~¥20/月 订阅 | 起步 ~¥20/月 订阅 | 1M 上下文，性价比之王 |
-| Kimi K2.6 | ~¥8/M tokens | ~¥30/M tokens | 长上下文更贵 |
+| Kimi K2.7-Code | ~$0.95/M tokens | ~$4.00/M tokens | 开源，256K 上下文，思考 token 少 30% |
+| 小米 MiMo v2.5 | 视订阅计划 | 视订阅计划 | 1M 上下文，小米生态 |
 | Claude Opus 4 (中转) | ~¥20/M tokens | ~¥100/M tokens | 顶级质量 |
 
 > 数据随时会变，请以各家官网最新价格为准。
