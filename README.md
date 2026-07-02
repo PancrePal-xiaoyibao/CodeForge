@@ -1,5 +1,12 @@
 <div align="center">
 
+<img src="./assets/header.png" alt="CodeForge — Community Full-Stack AI Development Engine" width="100%" />
+
+<br />
+<br />
+
+<img src="./assets/logo.png" alt="CodeForge logo" width="128" />
+
 # 🔨 CodeForge
 
 ### 社区开源贡献引擎 · Community Contribution Engine
@@ -11,6 +18,7 @@
   <a href="./ETHICS.md"><img src="https://img.shields.io/badge/Ethics-Human--in--the--Loop-red.svg" alt="Ethics" /></a>
   <a href="#-新手开发者-15-分钟第一次贡献"><img src="https://img.shields.io/badge/Platforms-Claude%20%7C%20Codex%20%7C%20Gemini-green.svg" alt="Platforms" /></a>
   <a href="#-技能矩阵"><img src="https://img.shields.io/badge/Skills-16%20%2B%20deep--research-orange.svg" alt="Skills" /></a>
+  <a href="./docs/cn-api-providers.md"><img src="https://img.shields.io/badge/🇨🇳%20国产API-GLM%20%7C%20DeepSeek%20%7C%20Kimi-red.svg" alt="国产API" /></a>
   <img src="https://img.shields.io/badge/中文-友好-brightgreen.svg" alt="中文友好" />
 </p>
 
@@ -18,6 +26,8 @@
   <a href="#-新手开发者-15-分钟第一次贡献"><b>🚀 新手：15 分钟第一次贡献</b></a>
   ·
   <a href="#-技能矩阵"><b>技能矩阵</b></a>
+  ·
+  <a href="./docs/cn-api-providers.md"><b>🇨🇳 国内 API</b></a>
   ·
   <a href="#-熟练开发者本地部署"><b>本地部署</b></a>
   ·
@@ -141,6 +151,22 @@ npm install -g @google/gemini-cli && gemini
 ```
 
 首次运行会提示登录/贴 API Key。搞定后你就有了一个"空白的 AI 副驾驶"——它现在还不懂 API-First、还不会做 deep research。
+
+> [!IMPORTANT]
+> **🇨🇳 国内开发者请看这里**：如果你无法访问 Anthropic 官方 API，Claude Code 支持通过环境变量指向**国产大模型**（智谱 GLM · DeepSeek · Kimi · 小米 MiMo · 硅基流动）。
+>
+> Codespace / macOS / Linux 一分钟示例（DeepSeek）：
+> ```bash
+> export ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
+> export ANTHROPIC_AUTH_TOKEN=your-API-key
+> export ANTHROPIC_MODEL=deepseek-v4-pro[1m]
+> export ANTHROPIC_SMALL_FAST_MODEL=deepseek-v4-flash[1m]
+> claude --permission-mode bypassPermissions
+> ```
+>
+> 完整六家供应商配置模板（bash / PowerShell / CMD 全平台）、持久化技巧、一键切换函数、成本对照 → 📖 **[docs/cn-api-providers.md](./docs/cn-api-providers.md)**
+>
+> ✅ 已实测：DeepSeek-V4-Pro / GLM-5.1 / Kimi-K2.6 均可顺畅驱动 CodeForge 全流程 skill。
 
 ---
 
@@ -327,12 +353,15 @@ chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh --yes
 - 🐛 **Bug / 建议**: [CodeForge Issues](https://github.com/PancrePal-xiaoyibao/CodeForge/issues)
 - 🧭 **社区总入口**: [PancrePal-xiaoyibao Projects](https://github.com/orgs/PancrePal-xiaoyibao/projects)
 - 🤝 **贡献指南**: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- 🇨🇳 **国内 API 配置**: [docs/cn-api-providers.md](./docs/cn-api-providers.md) — GLM · DeepSeek · Kimi · 小米 MiMo · 硅基流动
 - 🔒 **伦理举报**: [ETHICS.md 第 7 节](./ETHICS.md#7-举报与反馈)
 - 🌱 **姐妹项目**: [VitaForge](https://github.com/PancrePal-xiaoyibao/VitaForge)
 
 ---
 
 <div align="center">
+
+<img src="./assets/logo.png" alt="CodeForge signature logo" width="72" />
 
 **🔨 看到 issue → 一句话装 CodeForge → 一句话让 Agent 干活 → 提 PR。喵～** (´｡• ᵕ •｡`) ♡
 
