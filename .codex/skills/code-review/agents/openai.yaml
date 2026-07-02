@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "确定性规则 + Agent 场景分析的混合代码审查，OCR CLI 优先"
+  default_prompt: "使用 $code-review 对当前变更执行混合审查，按 High/Medium/Low 分级呈报。"

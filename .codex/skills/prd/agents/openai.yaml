@@ -1,0 +1,8 @@
+interface:
+  display_name: "PRD Generator"
+  short_description: "Generate structured Product Requirements Documents for features"
+  default_prompt: "Help me create a PRD for a new feature"
+  brand_color: "#10B981"
+
+policy:
+  allow_implicit_invocation: true

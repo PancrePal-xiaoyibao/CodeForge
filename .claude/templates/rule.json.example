@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "path": "src/api/**",
+      "rule": "All API handlers must validate input parameters. Check for missing required fields, type mismatches, and injection risks."
+    },
+    {
+      "path": "**/*.sql",
+      "rule": "Check for SQL injection risks, missing parameterized queries, and unescaped user input."
+    },
+    {
+      "path": "src/auth/**",
+      "rule": "Verify authentication/authorization logic: token validation, permission checks, session management. Flag any hardcoded credentials."
+    },
+    {
+      "path": "**/*.test.*",
+      "rule": "Tests must cover at least one happy path and one error path. Flag tests that only assert truthy values without meaningful checks."
+    },
+    {
+      "path": "**/*controller*",
+      "rule": "Controllers should be thin — business logic belongs in services. Flag controllers with more than 30 lines of logic."
+    },
+    {
+      "path": "**/migrations/**",
+      "rule": "Database migrations must be reversible. Check for destructive operations (DROP, DELETE) without corresponding rollback."
+    }
+  ]
+}

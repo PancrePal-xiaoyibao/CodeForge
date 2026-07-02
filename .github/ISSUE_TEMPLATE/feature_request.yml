@@ -1,0 +1,48 @@
+name: ✨ Skill / Feature Request
+description: 建议新增 skill 或改进现有 skill
+title: "[Feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢建议喵～ 好的 skill 建议能让整个社区受益。
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 类型
+      options:
+        - 新增 skill
+        - 改进现有 skill
+        - 主调度路由优化
+        - 部署 / CI/CD 改进
+        - 文档改进
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解决什么问题？
+      placeholder: 什么场景下现在很别扭 / 缺一个 skill / 现有 skill 不够用？
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案
+      placeholder: 建议的 skill 名、触发场景、输出、路由位置
+
+  - type: textarea
+    id: alternative
+    attributes:
+      label: 已考虑的替代方案
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: 我是否想自己实现
+      options:
+        - label: 我愿意提 PR 实现（记得三镜像同步喵）

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Intent Grill"
+  short_description: "需求追问对齐专家，逐分支走设计树，维护 CONTEXT.md 领域术语表"
+  default_prompt: "使用 $intent-grill 对需求进行逐分支追问，维护 CONTEXT.md，直至共识达成。"

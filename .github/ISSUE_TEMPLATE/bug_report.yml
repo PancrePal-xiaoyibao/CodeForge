@@ -1,0 +1,68 @@
+name: 🐛 Bug Report
+description: 报告 CodeForge 的 bug（skill / 部署脚本 / 文档）
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢报告 bug 喵～ 请提供足够信息以便复现。
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 使用的 AI CLI
+      options:
+        - Claude Code
+        - Codex CLI
+        - Gemini CLI
+        - 三个都试过
+    validations:
+      required: true
+
+  - type: dropdown
+    id: env
+    attributes:
+      label: 运行环境
+      options:
+        - GitHub Codespace
+        - 本地 macOS
+        - 本地 Linux
+        - 本地 Windows (PowerShell)
+        - 本地 Windows (Git Bash)
+        - 其他
+    validations:
+      required: true
+
+  - type: input
+    id: skill
+    attributes:
+      label: 涉及的 skill / command（如适用）
+      placeholder: 如 /ai-spec, /deep-research
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 输入 /ai-spec ...
+        2. Agent 返回 ...
+        3. 期望是 ..., 实际是 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 报错信息
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 检查
+      options:
+        - label: 我已搜索过 issue，没有重复
+          required: true
+        - label: 我已阅读 ETHICS.md，本 issue 与其无冲突
+          required: true

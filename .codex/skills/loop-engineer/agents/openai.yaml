@@ -1,0 +1,8 @@
+interface:
+  display_name: "Loop Engineer"
+  short_description: "需求驱动的系统化 Skill Package 工程师 — 从需求出发设计多 skill 联动 loop 体系"
+  default_prompt: "我需要设计一个完整的 skill loop 系统，请启动 Loop Engineer"
+  brand_color: "#8B5CF6"
+
+policy:
+  allow_implicit_invocation: false

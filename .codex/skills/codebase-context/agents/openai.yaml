@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codebase Context"
+  short_description: "代码库知识图谱查询接口，支持影响分析/调用链/依赖图/重命名安全检查"
+  default_prompt: "使用 $codebase-context 查询代码架构信息，优先通过 GitNexus MCP 获取精确图谱数据。"

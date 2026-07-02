@@ -1,0 +1,54 @@
+{
+  "name": "CodeForge Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-python.python",
+        "ms-vscode.makefile-tools",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.encoding": "utf8",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "postAttachCommand": {
+    "welcome": "echo '' && echo '🔨 CodeForge Codespace 已就绪！' && echo '' && echo '快速开始:' && echo '  1. 运行 : bash deploy/deploy.sh --yes' && echo '  2. 启动 : claude   (或 codex / gemini)' && echo '  3. 主入口: /ai-spec 描述你的需求' && echo ''"
+  },
+
+  "remoteEnv": {
+    "ANTHROPIC_MODEL": "claude-opus-4-7",
+    "PYTHONUTF8": "1"
+  },
+
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "16gb"
+  },
+
+  "portsAttributes": {
+    "3000": { "label": "Frontend Dev Server" },
+    "5173": { "label": "Vite Dev Server" },
+    "8000": { "label": "Backend API" },
+    "8080": { "label": "General HTTP" }
+  }
+}

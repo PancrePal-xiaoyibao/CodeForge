@@ -1,0 +1,8 @@
+interface:
+  display_name: "Ralph YOLO"
+  short_description: "YOLO模式 — 直接用 Claude Code 子 Agent 实现 PRD"
+  default_prompt: "使用 YOLO 模式自动实现 PRD 中的所有用户故事"
+  brand_color: "#EF4444"
+
+policy:
+  allow_implicit_invocation: false

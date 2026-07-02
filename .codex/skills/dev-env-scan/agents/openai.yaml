@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev Env Scan"
+  short_description: "开发环境自动检测 + 偏好收集，输出 .dev-profile.json 和 CLAUDE.md 环境段落"
+  default_prompt: "使用 $dev-env-scan 检测当前环境并收集开发者偏好，生成结构化 profile。"

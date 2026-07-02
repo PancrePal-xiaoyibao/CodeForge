@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/mcp-config.schema.json",
+  "_comment": "CodeForge 推荐 MCP 配置模板 — 复制到 ~/.claude/mcp.json 或 ~/.codex/mcp.json 后填写 API keys",
+
+  "mcpServers": {
+    "tavily": {
+      "_purpose": "Tavily 搜索 — deep-research 主力搜索引擎",
+      "_apply_key": "https://tavily.com/",
+      "command": "npx",
+      "args": ["-y", "tavily-mcp"],
+      "env": {
+        "TAVILY_API_KEY": "<your-tavily-key>"
+      }
+    },
+
+    "openalex": {
+      "_purpose": "OpenAlex — 学术文献与技术论文检索",
+      "_apply_key": "https://openalex.org/",
+      "command": "npx",
+      "args": ["-y", "openalex-mcp"],
+      "env": {
+        "OPENALEX_EMAIL": "<your-email-for-polite-pool>"
+      }
+    },
+
+    "brave-search": {
+      "_purpose": "Brave Search — 隐私友好通用搜索",
+      "_apply_key": "https://brave.com/search/api/",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "<your-brave-key>"
+      }
+    },
+
+    "github": {
+      "_purpose": "GitHub MCP — issue/PR/code 搜索与操作（新人贡献工作流必备）",
+      "_apply_key": "https://github.com/settings/tokens (scope: repo, read:org, workflow)",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "<your-github-pat>"
+      }
+    },
+
+    "playwright": {
+      "_purpose": "Playwright — 浏览器自动化，抓取动态渲染页面（调研深度模式）",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    }
+  },
+
+  "_deploy_notes": {
+    "step1": "复制本文件为 ~/.claude/mcp.json（Claude Code）",
+    "step2": "或复制为 ~/.codex/mcp.json（Codex CLI）",
+    "step3": "或复制为 ~/.gemini/mcp.json（Gemini CLI，需 CLI 支持）",
+    "step4": "填写所有 <your-*> 占位符为真实 key",
+    "step5": "无 MCP 也能用 —— skill 内置降级逻辑，但 deep-research 深度会受限"
+  }
+}

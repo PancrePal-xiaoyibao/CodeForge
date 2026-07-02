@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Actions Architect"
+  short_description: "Generate correct, production-ready GitHub Actions workflow YAML for any ecosystem — lint, multi-platform multi-arch builds, Docker, releases."
+  default_prompt: "Use this skill to generate GitHub Actions CI/CD workflow files. Describe your project ecosystem (Python/Node/Rust/Go/Docker/C++/Java/R/Flutter/.NET) and what you need (lint checks, multi-platform builds, release pipelines). The skill will produce complete, correct YAML files with pitfall validation."

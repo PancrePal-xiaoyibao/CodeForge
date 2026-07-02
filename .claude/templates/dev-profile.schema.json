@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Developer Profile",
+  "description": "Structured output from /dev-env-scan — environment capabilities and developer preferences",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "dev-profile/v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this profile was generated"
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "os": {
+          "type": "object",
+          "properties": {
+            "name": {"type": "string"},
+            "version": {"type": "string"},
+            "arch": {"type": "string", "enum": ["x64", "arm64", "x86"]}
+          },
+          "required": ["name", "version", "arch"]
+        },
+        "shell": {"type": "string"},
+        "languages": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "properties": {
+                  "version": {"type": "string"},
+                  "managers": {
+                    "type": "array",
+                    "items": {"type": "string"}
+                  }
+                },
+                "required": ["version"]
+              }
+            ]
+          }
+        },
+        "gpu": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "properties": {
+                "vendor": {"type": "string", "enum": ["nvidia", "amd", "intel", "apple"]},
+                "model": {"type": "string"},
+                "vram_gb": {"type": "number"},
+                "cuda": {"type": ["string", "null"]}
+              },
+              "required": ["vendor", "model"]
+            }
+          ]
+        },
+        "docker": {"type": "boolean"},
+        "memory_gb": {"type": "number"},
+        "disk_free_gb": {
+          "type": "object",
+          "additionalProperties": {"type": "number"}
+        }
+      },
+      "required": ["os", "shell", "languages"]
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "primary_languages": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "User's preferred languages for this project"
+        },
+        "package_managers": {
+          "type": "object",
+          "additionalProperties": {"type": "string"},
+          "description": "Preferred package manager per language ecosystem"
+        },
+        "deployment": {
+          "type": "string",
+          "enum": ["docker", "bare-metal", "serverless", "paas", "uv", "conda"],
+          "description": "Preferred deployment style"
+        },
+        "testing": {
+          "type": "string",
+          "description": "Testing philosophy: tdd, coverage-NN, post-impl, minimal"
+        },
+        "ci": {
+          "type": "string",
+          "enum": ["github-actions", "gitlab-ci", "jenkins", "local", "none"],
+          "description": "CI/CD platform preference"
+        },
+        "style_enforcement": {
+          "type": "string",
+          "enum": ["strict", "moderate", "minimal"],
+          "description": "How strictly to enforce code style"
+        },
+        "repo_style": {
+          "type": "string",
+          "enum": ["monorepo", "polyrepo"],
+          "description": "Repository organization preference"
+        }
+      },
+      "required": ["primary_languages"]
+    },
+    "constraints": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Special constraints: offline, air-gapped, compliance, etc."
+    }
+  },
+  "required": ["$schema", "generated_at", "environment", "preferences"]
+}

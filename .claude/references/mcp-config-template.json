@@ -1,0 +1,54 @@
+{
+  "$schema": "MCP Server Configuration for GitNexus",
+  "_comment": "Copy the 'gitnexus' entry into your settings.json mcpServers section",
+
+  "system_level": {
+    "_path_unix": "~/.claude/settings.json",
+    "_path_windows": "%USERPROFILE%/.claude/settings.json",
+    "_description": "Available to all projects on this machine",
+    "mcpServers": {
+      "gitnexus": {
+        "command": "gitnexus",
+        "args": ["mcp"],
+        "type": "stdio"
+      }
+    }
+  },
+
+  "project_level": {
+    "_path": ".claude/settings.local.json",
+    "_description": "Available only to this project",
+    "mcpServers": {
+      "gitnexus": {
+        "command": "gitnexus",
+        "args": ["mcp"],
+        "type": "stdio"
+      }
+    }
+  },
+
+  "with_custom_db_path": {
+    "_description": "For repos where .gitnexus/ is in a non-standard location",
+    "mcpServers": {
+      "gitnexus": {
+        "command": "gitnexus",
+        "args": ["mcp", "--db-path", "/path/to/.gitnexus"],
+        "type": "stdio"
+      }
+    }
+  },
+
+  "available_mcp_tools": [
+    "list_repos — Discover indexed repositories",
+    "query — Hybrid BM25 + vector search over the graph",
+    "cypher — Ad hoc Cypher queries against the schema",
+    "context — Callers, callees, processes for one symbol",
+    "impact — Blast radius (upstream/downstream) with risk summary",
+    "detect_changes — Map git diffs to affected symbols and processes",
+    "rename — Graph-assisted multi-file rename with dry_run preview",
+    "api_impact — Pre-change impact report for an API route handler",
+    "route_map — API route → handler → consumer mappings",
+    "tool_map — MCP/RPC tool definitions and handlers",
+    "shape_check — Response shape vs consumer property access mismatches"
+  ]
+}
