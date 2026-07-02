@@ -131,7 +131,7 @@
 2. **右上角 `<> Code` 按钮 → `Codespaces` 标签页 → `Create codespace on main`**
 3. 等 30 秒–2 分钟，浏览器里就打开一个完整的 VS Code。
 
-> 💡 **每个 GitHub 账号有 60 小时/月免费 Codespace 额度**，日常小任务足够。
+> 💡 **每个 GitHub 账号有 60 小时/月免费 Codespace 额度**，日常小任务足够。开发结束以后记得及时关闭这个Codespace，不然会一直计时。
 
 ---
 
