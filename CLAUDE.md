@@ -89,3 +89,5 @@ CodeForge synchronizes every skill across three platforms:
 | Gemini CLI | `.gemini/skills/` | (skills auto-trigger via description) |
 
 Any skill change **must** update all three mirrors — this is enforced by review.
+
+> 📖 **用其他 agent（Antigravity / OpenClaw / Hermes / WorkBuddy 等）？** 多 Agent 分类部署规则（🅰️ A 类直接 merge / 🅱️ B 类中立桥接）见 [`docs/agent-deployment-guide.md`](./docs/agent-deployment-guide.md)。

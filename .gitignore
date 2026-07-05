@@ -30,6 +30,7 @@ venv/
 .plan/
 .dev-profile.json
 _archived/
+cache/
 
 # OS
 Icon

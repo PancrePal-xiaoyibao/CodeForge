@@ -60,3 +60,4 @@ On first run in a new project, `ai-spec` must execute **Repo Init**: read or cre
 - **Ordered cross-layer execution** — Backend first → API docs → frontend consumption → integration verification.
 - **Research before opinion** — Tech selection or unfamiliar domains → `deep-research` first, do not answer from stale memory.
 - **Repo Init + task loop** — `Archive → Develop → Test → Update plan → commit/push only with explicit authorization`.
+- **Multi-agent deployment** — Installing CodeForge skills into other agents (Antigravity / OpenClaw / Hermes / WorkBuddy) follows the A/B classification in [`docs/agent-deployment-guide.md`](./docs/agent-deployment-guide.md).

@@ -31,6 +31,8 @@
   ·
   <a href="#-熟练开发者本地部署"><b>本地部署</b></a>
   ·
+  <a href="#-多-agent-分类部署"><b>多 Agent 部署</b></a>
+  ·
   <a href="./CONTRIBUTING.md"><b>贡献指南</b></a>
 </p>
 
@@ -184,6 +186,12 @@ npm install -g @google/gemini-cli && gemini
 
 ### Step 4 · 一句话部署 CodeForge 到 Agent 环境
 
+> 🤖 **先分流**：你的 agent 属于哪一类？（不确定？看 [§ 多 Agent 分类部署](#-多-agent-分类部署)）
+> - 🅰️ **A 类**（Claude Code / Codex / Gemini / Antigravity）→ 用下面【A 类提示词】，99% 用户走这条
+> - 🅱️ **B 类**（OpenClaw / Hermes / WorkBuddy）→ 展开底部【B 类提示词】
+
+#### 🅰️ A 类 · Claude Code / Codex / Gemini / Antigravity
+
 **在 Agent 会话里，把下面这段完整贴进去**：
 
 ```text
@@ -203,6 +211,35 @@ npm install -g @google/gemini-cli && gemini
 ```
 
 Agent 会自动完成 git clone → 部署脚本 → 验证。**部署完成后，`/ai-spec` `/deep-research` `/api-first` 等 16+ 命令立即可用。**
+
+<details>
+<summary><b>🅱️ B 类 · 用 OpenClaw / Hermes (hermas) / WorkBuddy？点这里展开分流提示词</b></summary>
+
+B 类通用智能体没有官方 skill 目录约定，要走 `~/.agents/skills` **中立桥接层**接入 CodeForge。**在 Agent 会话里贴下面这段**（把 `[你的 agent 名]` 换成 OpenClaw / Hermes / WorkBuddy）：
+
+```text
+请把 https://github.com/PancrePal-xiaoyibao/CodeForge 部署到当前用户的本机 Agent 环境（B 类通用智能体路径）。
+
+背景：我用的是 [你的 agent 名]，属于无官方 skill 目录约定的通用智能体（B 类），需要走 ~/.agents/skills 中立桥接层接入 CodeForge。
+
+要求：
+1. 确认本机有 git 和可用 shell；如果缺依赖，先明确说明缺什么。
+2. 克隆仓库到合适的本地目录；如果目录已存在且是 Git 仓库，先 git pull --ff-only。
+3. 进入 CodeForge 仓库根目录后按系统执行 deploy 脚本：
+   - Windows PowerShell: powershell -ExecutionPolicy Bypass -File .\deploy\deploy.ps1 -Yes
+   - macOS / Linux Bash: chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh --yes
+4. 部署完成后确认中立桥接层就位：
+   ~/.agents/skills/ai-spec/SKILL.md
+5. 根据我的 agent 类型激活桥接：
+   - OpenClaw：配置 agent 读取 ~/.agents/skills/，或用 filesystem MCP 暴露该目录
+   - Hermes (hermas)：对核心 skill 逐个跑 /learn（如 /learn ~/.agents/skills/ai-spec/SKILL.md）
+   - WorkBuddy：在网页端配 MCP 指向 ~/.agents/skills/，或贴能力注入 prompt
+6. 报告：部署路径、桥接层就位情况、agent 特定激活步骤是否完成、下一步。
+```
+
+> 📖 每个 B 类 agent 的完整接入步骤与原理 → [docs/agent-deployment-guide.md §5](./docs/agent-deployment-guide.md)
+
+</details>
 
 ---
 
@@ -331,6 +368,23 @@ chmod +x ./deploy/deploy.sh && ./deploy/deploy.sh --yes
 装完直接 `claude` / `codex` / `gemini`，`/ai-spec` 就绪。
 
 **Codespace 用户特权**：仓库自带 [`.devcontainer/`](./.devcontainer/)，Codespace 启动会自动装 CLI + 跑 deploy 脚本，**零手动步骤**。
+
+---
+
+## 🤖 多 Agent 分类部署
+
+> 用 Claude Code / Codex / Gemini 之外的 agent？先判断它属于哪一类，再选部署路径喵～ (..•˘_˘•..)
+
+CodeForge 把 agent 分两类，**判定标准只有一个**：该 agent 有没有**官方、稳定、文档化的 skill 加载目录约定**。
+
+| 类别 | 判定 | 代表 agent | 部署方式 |
+|------|------|-----------|---------|
+| 🅰️ **A 类 · 专业 Agent** | 有官方 skill 目录约定 | Claude Code ⭐ · Codex · Gemini · Antigravity | deploy 脚本一键 merge，**零额外配置** |
+| 🅱️ **B 类 · 通用智能体** | 无官方 skill 目录约定 | OpenClaw · Hermes (hermas) · WorkBuddy | 走 `~/.agents/skills` 中立桥接 + MCP / prompt 投喂 |
+
+> 💡 deploy 脚本早就为两类 agent 都准备好了目录（A 类官方目录 + B 类中立桥接 `~/.agents/skills`），跑一次脚本全搞定。
+
+**详细规则、5 问判定 Checklist、每个 agent 的完整三平台（bash / PowerShell / CMD）命令、混合编排、FAQ、新增 agent 归位指南** → 📖 **[docs/agent-deployment-guide.md](./docs/agent-deployment-guide.md)**
 
 ---
 
