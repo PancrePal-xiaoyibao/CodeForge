@@ -58,6 +58,7 @@ Every development task follows `Archive → Develop → Test → Update plan →
 - **Layer-scoped debugging** — Identify owning layer first, no cross-layer patches.
 - **Research before opinion** — Tech selection or unfamiliar domain → `deep-research` first.
 - **Repo Init + task loop** — `Archive → Develop → Test → Update plan → commit/push only with explicit authorization`.
+- **Multi-agent deployment** — Installing CodeForge skills into other agents (Antigravity / OpenClaw / Hermes / WorkBuddy) follows the A/B classification in [`docs/agent-deployment-guide.md`](./docs/agent-deployment-guide.md).
 
 ---
 
