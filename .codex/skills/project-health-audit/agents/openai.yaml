@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Health Audit"
+  short_description: "变更前技术债基线扫描 — build/test/lint 状态 + 债务登记表 + before/during/after 分类"
+  default_prompt: "使用 $project-health-audit 在变更前建立项目健康基线并输出债务登记表。"

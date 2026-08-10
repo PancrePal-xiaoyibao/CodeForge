@@ -7,7 +7,7 @@ description: Loop 系统工程师 — 从用户需求出发，设计并开发完
 
 ## Overview
 
-Loop Engineer 是 skill-governor 的上层调度者。从用户需求出发，设计完整的多 skill 联动体系：盘点现有资产、识别缺口、逐一补齐、组包联调、编写平滑层，最终交付完整 package。
+Loop Engineer 是多 skill 联动 package 的系统工程师。从用户需求出发，设计完整的多 skill 联动体系：盘点现有资产、识别缺口、逐一补齐、组包联调、编写平滑层，最终交付完整 package。单个 skill 的开发/格式规范遵循仓库 CONTRIBUTING.md「Path B」章节。
 
 **两种工作模式：**
 - **模式 A: 新建 Package** — 完整执行 Phase 0 → Phase 5 全流程
@@ -28,7 +28,7 @@ Loop Engineer 是 skill-governor 的上层调度者。从用户需求出发，�
 5. Gate: 用户确认
 
 ### Phase 2: 缺失 Skill 开发
-- 对每个缺失 skill 走 skill-governor 全流程（三镜像同步）
+- 对每个缺失 skill 按仓库 CONTRIBUTING.md「Path B.3 新增 Skill 的标准结构」开发（三镜像同步 + frontmatter + agents/openai.yaml + 入口文档）
 - Gate: 缺失列表清零
 
 ### Phase 3: 组包
@@ -65,7 +65,7 @@ Gate: 用户确认 → commit
 
 | 文件 | 用途 | 何时加载 |
 |------|------|----------|
-| skill-governor | 单 skill 开发规范 | Phase 2 |
+| CONTRIBUTING.md「Path B」 | 单 skill 开发规范（三镜像标准结构） | Phase 2 |
 | 项目 README | 现有 skill 清单速查 | Phase 1 |
 
 ## 关联 Skill（网络调度协议）
@@ -73,3 +73,5 @@ Gate: 用户确认 → commit
 | 关系 | Skill | 场景 |
 |------|-------|------|
 | 被调用 | ai-spec | 需要设计多 skill 联动系统时 |
+| 调用 | discover-skill-opportunities | 资产盘点的机会发现补充 |
+| 配合 | code-review | package 交付前审查 |

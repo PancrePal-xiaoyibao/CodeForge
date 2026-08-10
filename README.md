@@ -17,7 +17,7 @@
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-BSL%201.1-blue.svg" alt="License: BSL 1.1" /></a>
   <a href="./ETHICS.md"><img src="https://img.shields.io/badge/Ethics-Human--in--the--Loop-red.svg" alt="Ethics" /></a>
   <a href="#-新手开发者-15-分钟第一次贡献"><img src="https://img.shields.io/badge/Platforms-Claude%20%7C%20Codex%20%7C%20Gemini-green.svg" alt="Platforms" /></a>
-  <a href="#-技能矩阵"><img src="https://img.shields.io/badge/Skills-16%20%2B%20deep--research-orange.svg" alt="Skills" /></a>
+  <a href="#-技能矩阵"><img src="https://img.shields.io/badge/Skills-23%20%2B%20deep--research-orange.svg" alt="Skills" /></a>
   <a href="./docs/cn-api-providers.md"><img src="https://img.shields.io/badge/🇨🇳%20国产API-GLM--5.2%20%7C%20DeepSeek%20%7C%20Kimi-red.svg" alt="国产API" /></a>
   <img src="https://img.shields.io/badge/中文-友好-brightgreen.svg" alt="中文友好" />
 </p>
@@ -42,7 +42,7 @@
 
 ## 📖 CodeForge 是什么
 
-一个**为开源社区新手设计的 AI 开发脚手架**。把 16 个开发 skill + `deep-research` 深度调研引擎打包成一句话就能部署的工具集。
+一个**为开源社区新手设计的 AI 开发脚手架**。把 23 个开发 skill + `deep-research` 深度调研引擎打包成一句话就能部署的工具集。
 
 > **它不改变你的项目，它改变你 Agent 的能力。**
 >
@@ -323,14 +323,21 @@ CodeForge 部署完成后，Agent 就获得下面这些能力：
 | 🌱 **环境扫描** | `/dev-env-scan` | 扫技术栈、既有约定，输出 `.dev-profile.json` |
 | 🧭 **需求追问** | `/intent-grill` | 模糊需求逐分支对齐，维护 CONTEXT.md |
 | 📋 **PRD 生成** | `/prd` | 结构化 PRD 文档 |
+| 🩺 **健康基线** | `/health-audit` | 变更前技术债扫描，输出债务登记表 + 影响图 |
+| ✅ **SPEC 执行** | `/goal-driven` | 批准后 SPEC 证据化执行（里程碑循环 + 提交授权门） |
+| 🔁 **迭代管理** | `/iteration` | 交付后残差分类（BUG/DEBT/修订/新变更）+ 下一 Gate |
 | 🏗️ **API-First** | `/api-first` | 三层分离，5 步后端闭环 |
 | 🐛 **代码调试** | `/debug` | 上下文优先调试，维护 `.debug/` |
 | 🎨 **UI 调试** | `/debug-ui` | 前端视觉与渲染调试 |
-| 🧠 **代码库图谱** | `/codebase-context` | 影响分析、调用链、依赖 |
+| 🧠 **代码库图谱** | `/codebase-context` | 图谱查询（codebase-memory MCP 优先 + 降级）、影响分析、调用链 |
 | 🔬 **代码审查** | `/code-review` | OCR CLI + Agent 混合，High/Medium/Low 分级 |
 | 💫 **UX 审计** | `/ux-experience-audit` | 跨层用户体验诊断 |
 | 🤖 **自主循环** | `/ralph` / `/ralph-yolo` | PRD 驱动的自主开发循环 |
 | 🧩 **多 skill 编排** | `/loop-engineer` | 多 skill 联动 package 设计 |
+| 💡 **技能机会发现** | `/discover-skill` | 从工作证据挖掘可打包 skill 的模式 + 会话复盘 |
+| 📐 **工作流初始化** | `/sam-init` | PDCO 循环开发规范（CLAUDE.md/PROGRESS-LOG/TASKS/self.opt） |
+| 🧬 **AI4S 干实验** | `/ai4s-lab` | 计算生物学端到端干实验引擎（SPEC+OODA+Gate，W1-W4） |
+| 🧪 **方法论提取** | `/extract-framework` | 从深度研究文档反向提取可复用研究框架 |
 | 🚀 **CI/CD** | `/gh-actions` | GitHub Actions workflow（多生态、多架构） |
 | 📦 **npm 发布** | `/nodejs-npm-auto-release` | 版本 + changelog + publish 全自动 |
 

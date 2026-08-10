@@ -19,13 +19,20 @@ For external information tasks (tech selection, literature, competitor scans), i
 | New repository / first agent run | `dev-env-scan` → `ai-spec` | Environment profile + project workflow |
 | Vague requirement | `intent-grill` → `ai-spec` | Clarified spec |
 | External info / tech selection / literature | `deep-research` → `ai-spec` | Structured research + citations |
+| Pre-change health baseline | `project-health-audit` → `prd` / `ai-spec` | Debt register + change-impact map |
 | Product feature from scratch | `prd` → `ai-spec` → `api-first-modular` | PRD + implementation plan |
 | Full-stack feature | `ai-spec` → `api-first-modular` → `code-review` | API-first implementation + review |
+| Approved-SPEC execution | `goal-driven-development` → `api-first-modular` → `code-review` | Evidence milestone loop + authorization gates |
 | Bug or regression | `codebase-context` → `code-debugger` | Impact map + targeted fix |
 | UI visual issue | `debug-ui` → `ux-experience-audit` | Visual polish + workflow check |
 | UX issue across layers | `ux-experience-audit` → `code-debugger` or `api-first-modular` | Cross-layer diagnosis |
 | Autonomous implementation | `prd` or `ai-spec` → `ralph` / `ralph-yolo` | Story loop execution |
+| Post-delivery iteration | `iteration-manager` | Residual classification + next Gate |
 | Package / multi-skill system | `loop-engineer` → `ai-spec` | Skill network design |
+| Skill opportunity mining | `discover-skill-opportunities` | Skill candidates + session review |
+| Project workflow bootstrap | `sam-dev-cc-init` | PDCO loop files |
+| Computational dry-lab research | `ai4s-dry-lab` | SPEC-driven OODA loop (W1-W4) |
+| Methodology extraction | `extract-research-framework` | Reusable research framework templates |
 | CI/CD or release | `gh-actions-architect` / `nodejs-npm-auto-release` | Workflow or release automation |
 
 Every development task follows `Archive → Develop → Test → Update plan → commit/push only with explicit authorization`.
@@ -42,8 +49,15 @@ Every development task follows `Archive → Develop → Test → Update plan →
 - **code-debugger** — Context-first debugging. Maintains `.debug/` documentation.
 - **debug-ui** — Top-tier UI visual design & implementation. Bridges "make it pop" aesthetic intent with Tailwind/CSS engineering.
 - **code-review** — Hybrid code review (OCR CLI × Agent). Structured High/Medium/Low classification.
-- **codebase-context** — Knowledge-graph queries (impact analysis, call chains, dependency graphs, rename safety) via GitNexus MCP/CLI with static-analysis fallback.
+- **codebase-context** — Knowledge-graph queries (impact analysis, call chains, dependency graphs, rename safety). codebase-memory MCP first (search_graph/trace_path/query_graph/Cypher), GitNexus/static-analysis fallback.
 - **prd** — Interactive PRD generator with clarifying-question loop.
+- **project-health-audit** — Pre-change evidence-backed health/debt baseline (HEALTH.md + debt register).
+- **goal-driven-development** — Approved-SPEC execution engine: milestone loop, deterministic checks, spec-aware review, commit/push authorization gates.
+- **iteration-manager** — Post-delivery residual classification (BUG/DEBT/PRD_AMENDMENT/SPEC_AMENDMENT/NEW_CHANGE) and next-Gate routing.
+- **discover-skill-opportunities** — Skill opportunity mining from work evidence + session skill performance review.
+- **sam-dev-cc-init** — PDCO loop development workflow initialization (CLAUDE.md/PROGRESS-LOG.md/TASKS.md/self.opt).
+- **ai4s-dry-lab** — End-to-end AI4S dry-lab research engine: SPEC-driven, OODA loop, Gate control, W1-W4 mandatory records.
+- **extract-research-framework** — Reverse-extract reusable research methodology frameworks from deep-research documents.
 - **ralph** / **ralph-yolo** — Autonomous PRD execution loops.
 - **ux-experience-audit** — User-journey-driven UX scanning and cross-layer fix loop.
 - **loop-engineer** — Multi-skill package design: asset audit, gap analysis, orchestration layer.

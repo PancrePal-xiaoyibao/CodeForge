@@ -1,0 +1,4 @@
+interface:
+  display_name: "Discover Skill Opportunities"
+  short_description: "技能机会发现引擎 — 从会话/任务日志/工作历史挖掘可打包为 skill 的工作模式 + 当前会话 skill 表现复盘"
+  default_prompt: "使用 $discover-skill-opportunities 分析工作证据，发现值得打包为 skill 的可复用工作流。"

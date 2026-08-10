@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extract Research Framework"
+  short_description: "研究方法论反向提取器 — 从深度研究文档中抽象可复用研究框架模板（六维度方法论）"
+  default_prompt: "使用 $extract-research-framework 从深度研究文档中提取可复用的研究方法论框架。"

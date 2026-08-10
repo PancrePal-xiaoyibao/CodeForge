@@ -1,0 +1,4 @@
+interface:
+  display_name: "Iteration Manager"
+  short_description: "交付后迭代管理 — 残差分类 BUG/DEBT/PRD_AMENDMENT/SPEC_AMENDMENT/NEW_CHANGE + 下一 Gate"
+  default_prompt: "使用 $iteration-manager 分析交付结果并分类路由下一个受控迭代。"

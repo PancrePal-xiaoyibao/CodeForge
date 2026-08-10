@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sam Dev CC Init"
+  short_description: "PDCO 循环开发工作流初始化 — 一键建立 CLAUDE.md / PROGRESS-LOG.md / tasks/TASKS.md / self.opt"
+  default_prompt: "使用 $sam-dev-cc-init 初始化项目的 PDCO 循环开发工作流。"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI4S Dry Lab (端到端干实验自动化)"
+  short_description: "v2.2 — 强制 Worklog(W1) + 输出 README(W2) + 强制文献验证(W3) + 强制脚本日志(W4) + SPEC驱动 + OODA循环 + Gate门控的干实验全流程自动化研究引擎。适用于 scRNA-seq / 空间转录组 / 跨物种比较等计算生物学项目。"
+  default_prompt: "Use $ai4s-dry-lab to initialize a computational biology research project. v2.2 enforces mandatory worklog (W1), output README (W2), literature verification (W3), and mandatory script logging (W4) with package version recording, input validation, and execution timing. Supports SPEC-driven experiment design, OODA hypothesis loops, and gate-check validation."

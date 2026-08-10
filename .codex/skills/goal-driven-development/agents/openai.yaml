@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal-Driven Development"
+  short_description: "批准后 SPEC 的证据化执行引擎 — 里程碑循环 + 确定性检查 + commit/push 授权门"
+  default_prompt: "使用 $goal-driven-development 按已批准 SPEC 推进里程碑，持久化证据并在 commit/push 前停下等待授权。"

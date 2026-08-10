@@ -25,13 +25,19 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 | 新仓库 / 首次运行 Agent | `/dev-env-scan` → `/ai-spec` | 环境画像 + 项目工作流 |
 | 需求模糊 | `/intent-grill` → `/ai-spec` | 对齐后的技术规范 |
 | 需要外部信息 / 技术选型 / 文献调研 | `/deep-research` → `/ai-spec` | 结构化调研报告 + 引用 |
+| 变更前健康基线（重构/迁移/大型功能） | `/health-audit` → `/prd` / `/ai-spec` | 技术债登记表 + 变更影响图 |
 | 从 0 到 1 产品功能 | `/prd` → `/ai-spec` → `/api-first` | PRD + 规格 + API 包实现计划 |
-| 全栈功能开发 | `/ai-spec` → `/api-first` → `/code-review` | 后端 API 优先、文档、前端调用、审查 |
+| 全栈功能开发（已批准 SPEC 执行） | `/goal-driven` → `/api-first` → `/code-review` | 里程碑证据化执行 + 提交授权门 |
 | Bug / 回归 | `/codebase-context` → `/debug` | 先判定归属层，再定点修复和验证 |
 | UI 视觉 / 渲染问题 | `/debug-ui` → `/ux-experience-audit` | 视觉修复 + 用户路径验证 |
 | 功能可用但体验不通 | `/ux-experience-audit` → `/debug` 或 `/api-first` | 跨层体验诊断和修复 |
 | 大批量自动实现 | `/prd` 或 `/ai-spec` → `/ralph` / `/ralph-yolo` | User Story 循环实现 |
+| 交付后迭代管理 | `/iteration` | 残差分类 BUG/DEBT/PRD_AMENDMENT/SPEC_AMENDMENT + 下一 Gate |
 | 多 skill 系统 / 包设计 | `/loop-engineer` → `/ai-spec` | Gap 分析 + 编排层 |
+| skill 机会发现 / 会话复盘 | `/discover-skill` | 挖掘可打包 skill 的工作模式 |
+| 项目开发规范初始化 | `/sam-init` | PDCO 循环工作流（CLAUDE.md/PROGRESS-LOG/TASKS/self.opt） |
+| 计算生物学干实验 | `/ai4s-lab` | SPEC 驱动 + OODA + Gate（W1-W4 强制记录） |
+| 研究方法论沉淀 | `/extract-framework` | 从深度研究文档反向提取可复用框架 |
 | CI/CD / 发布 | `/gh-actions` / `/nodejs-npm-auto-release` | 工作流或 npm 发布闭环 |
 
 ---
@@ -50,7 +56,14 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 | `/ux-experience-audit` | Cross-layer UX audit and fix loop |
 | `/prd` | Generate structured PRD documents |
 | `/code-review` | 混合代码审查（OCR CLI 优先 + Agent 降级，High/Medium/Low 分级） |
-| `/codebase-context` | 代码库知识图谱查询（GitNexus MCP 优先 + 静态分析降级） |
+| `/codebase-context` | 代码库知识图谱查询（codebase-memory MCP 图谱优先 + GitNexus/静态分析降级） |
+| `/health-audit` | 变更前项目健康与技术债基线审计 |
+| `/goal-driven` | 批准后 SPEC 的证据化执行（里程碑循环 + 提交授权门） |
+| `/iteration` | 交付后迭代管理（残差分类 + 下一 Gate） |
+| `/discover-skill` | 技能机会发现 + 会话 skill 表现复盘 |
+| `/sam-init` | PDCO 循环开发工作流初始化 |
+| `/ai4s-lab` | AI4S 端到端干实验自动化研究引擎 |
+| `/extract-framework` | 研究方法论反向提取 |
 | `/ralph` | Autonomous dev loop driven by PRD (manual cycle count) |
 | `/ralph-yolo` | Ralph fully autonomous mode (unattended) |
 | `/loop-engineer` | 多 skill 联动 package 设计与开发 |
