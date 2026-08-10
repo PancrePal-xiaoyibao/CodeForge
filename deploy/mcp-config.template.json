@@ -3,6 +3,13 @@
   "_comment": "CodeForge 推荐 MCP 配置模板 — 复制到 ~/.claude/mcp.json 或 ~/.codex/mcp.json 后填写 API keys",
 
   "mcpServers": {
+    "codebase-memory-mcp": {
+      "_purpose": "codebase-memory — 代码库知识图谱（/codebase-context 核心）。一键安装：curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash（Windows: install.ps1）。无 API key 需求",
+      "_apply_key": "https://github.com/DeusData/codebase-memory-mcp",
+      "command": "codebase-memory-mcp",
+      "type": "stdio"
+    },
+
     "tavily": {
       "_purpose": "Tavily 搜索 — deep-research 主力搜索引擎",
       "_apply_key": "https://tavily.com/",
@@ -54,7 +61,7 @@
     "step1": "复制本文件为 ~/.claude/mcp.json（Claude Code）",
     "step2": "或复制为 ~/.codex/mcp.json（Codex CLI）",
     "step3": "或复制为 ~/.gemini/mcp.json（Gemini CLI，需 CLI 支持）",
-    "step4": "填写所有 <your-*> 占位符为真实 key",
-    "step5": "无 MCP 也能用 —— skill 内置降级逻辑，但 deep-research 深度会受限"
+    "step4": "填写所有 <your-*> 占位符为真实 key（codebase-memory-mcp 无需 key）",
+    "step5": "无 MCP 也能用 —— skill 内置降级逻辑，但 deep-research 深度会受限；codebase-context 降级为 GitNexus/静态分析"
   }
 }

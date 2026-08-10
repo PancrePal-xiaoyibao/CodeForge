@@ -345,8 +345,20 @@ CodeForge 部署完成后，Agent 就获得下面这些能力：
 
 ## 🔌 推荐 MCP（可选，增强调研）
 
-不装也能用；装上后 `/deep-research` 更强：
+不装也能用；装上后 `/deep-research` / `/codebase-context` 更强：
 
+- **codebase-memory-mcp** ([GitHub](https://github.com/DeusData/codebase-memory-mcp)) — ⭐ **强烈推荐**。把代码库索引为知识图谱，`/codebase-context` 调用 `search_graph / trace_path / query_graph` 查调用链、影响面、死代码、架构聚类，一次查询 ~500 tokens，比大范围 grep（~80K tokens）节省 99% 上下文。**先部署再调用本技能**：
+
+  ```bash
+  # macOS / Linux 一键安装
+  curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash
+  ```
+  ```powershell
+  # Windows 一键安装
+  Invoke-WebRequest -Uri https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1 -OutFile install.ps1
+  Unblock-File .\install.ps1
+  .\install.ps1
+  ```
 - **Tavily** ([申请](https://tavily.com/)) — 主力搜索
 - **OpenAlex** ([申请](https://openalex.org/)) — 学术文献
 - **GitHub MCP** ([申请](https://github.com/settings/tokens)) — issue / PR / code 搜索

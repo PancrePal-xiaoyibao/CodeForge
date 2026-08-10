@@ -13,20 +13,39 @@ description: 代码库知识图谱接口 — 将代码库索引为依赖/调用�
 2. **GitNexus MCP/CLI** — 无 codebase-memory 时使用，`gitnexus mcp`
 3. **内建静态分析** — 两者皆无时使用，并主动推荐配置
 
-## 安装 codebase-memory MCP（首选路径）
+## 安装 codebase-memory-mcp（首选路径 · 官方开源项目）
+
+> 📌 **codebase-memory-mcp** 是独立的开源 MCP 服务：<https://github.com/DeusData/codebase-memory-mcp>
+> 部署一次，即可把任意代码库索引为知识图谱，供本 skill 及其他 skill 调用，**大幅降低 token 消耗**（图谱查询 ~500 tokens vs 大范围 grep ~80K tokens）。
 
 ```bash
-# 1. 安装（任意其一）
-npm install -g codebase-memory-mcp        # npm 版
-pip install codebase-memory-mcp           # PyPI 版
-# 或从源码: git clone https://github.com/PancrePal-xiaoyibao/codebase-memory-mcp
+# macOS / Linux 一键安装（官方脚本）
+curl -fsSL https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh | bash
+```
 
-# 2. 配置 MCP（~/.claude/settings.json 或项目 .mcp.json）
-# {"mcpServers": {"codebase-memory-mcp": {"command": "codebase-memory-mcp", "type": "stdio"}}}
+```powershell
+# Windows 一键安装（官方脚本）
+# 1. 下载安装器
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.ps1 -OutFile install.ps1
+# 2. (可选但推荐) 检查脚本内容
+notepad install.ps1
+# 3. 解除下载文件锁定（移除浏览器/Invoke-WebRequest 添加的 Mark-of-the-Web 限制）
+Unblock-File .\install.ps1
+# 4. 运行
+.\install.ps1
+```
 
-# 3. 索引项目（首次使用必做）
+安装后配置 MCP（`~/.claude/settings.json` 或项目 `.mcp.json`）：
+
+```json
+{"mcpServers": {"codebase-memory-mcp": {"command": "codebase-memory-mcp", "type": "stdio"}}}
+```
+
+索引项目（首次使用必做）：
+
+```bash
 codebase-memory-mcp cli list_projects                        # 查已索引项目
-codebase-memory-mcp cli index_repository --repo-path . --mode full   # 建索引
+codebase-memory-mcp cli index_repository --repo-path . --mode full   # 建索引（full 模式含语义边）
 ```
 
 ## GitNexus 降级配置
