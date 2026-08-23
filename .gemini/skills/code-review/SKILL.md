@@ -21,7 +21,8 @@ description: 混合代码审查系统 — 结合确定性工程规则与 Agent �
 3. 收集业务上下文（CONTEXT.md / PRD / commit msg）
 4. 执行审查（OCR CLI 或 Agent 内建）
 5. 分类呈报 High/Medium，丢弃 Low
-6. 修复应用（需确认）
+6. 🧹 测试遗留与代码老鼠屎审查维度（必查）——检查 diff 中测试闭环残留：测试产物泄漏（临时输出/fixture/未忽略生成物/测试临时 db 缓存截图被提交）、代码层老鼠屎（print/console.log/debugger/注释掉的测试块/临时 TODO-FIXME/硬编码测试数据/mock 残留）。泄漏的运行数据记 High（删除风险）；纯测试产物确认已被 T1 清理而非提交。完整规则见 `code-debugger` T0–T3。审查期间不自动删除，通报并路由到 `code-debugger` 清理。
+7. 修复应用（需确认）
 
 ## Custom Rules
 

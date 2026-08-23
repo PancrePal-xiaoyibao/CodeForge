@@ -81,6 +81,7 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 3. **Cross-layer task decomposition** — Requirements spanning multiple layers must be split into ordered sub-tasks along API boundaries — backend first → API docs → frontend consumption → integration verification.
 4. **Repo Init + task loop** — Every development task follows `Archive → Develop → Test → Update plan → commit/push only with explicit authorization`. Never auto-commit without user confirmation.
 5. **Research before opinion** — For technology selection, external SDKs, latest specs, or unfamiliar domains, run `/deep-research` first; do not answer from stale memory.
+6. **Test artifact hygiene** — 测试产物卫生铁律。每次测试/验证/Checkfix 前后必须遵守 T0 测试前检查 → T1 测试后清扫 → T2 区分测试产物与运行数据（运行数据绝不删）→ T3 代码层老鼠屎清扫。完整规则见 `code-debugger` T0–T3。
 
 ---
 
