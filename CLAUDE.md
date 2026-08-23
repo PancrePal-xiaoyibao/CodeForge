@@ -38,6 +38,7 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 | 项目开发规范初始化 | `/sam-init` | PDCO 循环工作流（CLAUDE.md/PROGRESS-LOG/TASKS/self.opt） |
 | 计算生物学干实验 | `/ai4s-lab` | SPEC 驱动 + OODA + Gate（W1-W4 强制记录） |
 | 研究方法论沉淀 | `/extract-framework` | 从深度研究文档反向提取可复用框架 |
+| 全栈安全审计 | `/security-audit` | `.debug/` 证据驱动分级报告（只审计不修复） |
 | CI/CD / 发布 | `/gh-actions` / `/nodejs-npm-auto-release` | 工作流或 npm 发布闭环 |
 
 ---
@@ -64,6 +65,7 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 | `/sam-init` | PDCO 循环开发工作流初始化 |
 | `/ai4s-lab` | AI4S 端到端干实验自动化研究引擎 |
 | `/extract-framework` | 研究方法论反向提取 |
+| `/security-audit` | 全栈安全审计（图谱嵌入 + 分面审计 + CVE + 渗透 + 分级报告，只审计不修复） |
 | `/ralph` | Autonomous dev loop driven by PRD (manual cycle count) |
 | `/ralph-yolo` | Ralph fully autonomous mode (unattended) |
 | `/loop-engineer` | 多 skill 联动 package 设计与开发 |

@@ -17,7 +17,7 @@
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-BSL%201.1-blue.svg" alt="License: BSL 1.1" /></a>
   <a href="./ETHICS.md"><img src="https://img.shields.io/badge/Ethics-Human--in--the--Loop-red.svg" alt="Ethics" /></a>
   <a href="#-新手开发者-15-分钟第一次贡献"><img src="https://img.shields.io/badge/Platforms-Claude%20%7C%20Codex%20%7C%20Gemini-green.svg" alt="Platforms" /></a>
-  <a href="#-技能矩阵"><img src="https://img.shields.io/badge/Skills-23%20%2B%20deep--research-orange.svg" alt="Skills" /></a>
+  <a href="#-技能矩阵"><img src="https://img.shields.io/badge/Skills-24%20%2B%20deep--research-orange.svg" alt="Skills" /></a>
   <a href="./docs/cn-api-providers.md"><img src="https://img.shields.io/badge/🇨🇳%20国产API-GLM--5.2%20%7C%20DeepSeek%20%7C%20Kimi-red.svg" alt="国产API" /></a>
   <img src="https://img.shields.io/badge/中文-友好-brightgreen.svg" alt="中文友好" />
 </p>
@@ -42,7 +42,7 @@
 
 ## 📖 CodeForge 是什么
 
-一个**为开源社区新手设计的 AI 开发脚手架**。把 23 个开发 skill + `deep-research` 深度调研引擎打包成一句话就能部署的工具集。
+一个**为开源社区新手设计的 AI 开发脚手架**。把 24 个开发 skill + `deep-research` 深度调研引擎打包成一句话就能部署的工具集。
 
 > **它不改变你的项目，它改变你 Agent 的能力。**
 >
@@ -338,6 +338,7 @@ CodeForge 部署完成后，Agent 就获得下面这些能力：
 | 📐 **工作流初始化** | `/sam-init` | PDCO 循环开发规范（CLAUDE.md/PROGRESS-LOG/TASKS/self.opt） |
 | 🧬 **AI4S 干实验** | `/ai4s-lab` | 计算生物学端到端干实验引擎（SPEC+OODA+Gate，W1-W4） |
 | 🧪 **方法论提取** | `/extract-framework` | 从深度研究文档反向提取可复用研究框架 |
+| 🔐 **安全审计** | `/security-audit` | 全栈安全审计（图谱嵌入 + 分面审计 + CVE + 渗透 + `.debug/` 分级报告，只审计不修复） |
 | 🚀 **CI/CD** | `/gh-actions` | GitHub Actions workflow（多生态、多架构） |
 | 📦 **npm 发布** | `/nodejs-npm-auto-release` | 版本 + changelog + publish 全自动 |
 

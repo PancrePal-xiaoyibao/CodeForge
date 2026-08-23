@@ -37,6 +37,7 @@ On first run in a new project, `ai-spec` must execute **Repo Init**: read or cre
 | `sam-dev-cc-init` | PDCO loop development workflow initialization (CLAUDE.md/PROGRESS-LOG/TASKS/self.opt) | `.codex/skills/sam-dev-cc-init/` |
 | `ai4s-dry-lab` | End-to-end AI4S dry-lab engine — SPEC-driven, OODA loop, Gate control (W1-W4) | `.codex/skills/ai4s-dry-lab/` |
 | `extract-research-framework` | Reverse-extract reusable research methodology frameworks from deep-research docs | `.codex/skills/extract-research-framework/` |
+| `security-audit` | Full-stack security audit — codebase graph embed + stack-surface static audit + dependency CVE + public/internal pentest, evidence-graded report (audit-only) | `.codex/skills/security-audit/` |
 | `nodejs-npm-auto-release` | Node.js / npm auto-release | `.codex/skills/nodejs-npm-auto-release/` |
 | `gh-actions-architect` | GitHub Actions CI/CD workflow (multi-ecosystem, multi-arch) | `.codex/skills/gh-actions-architect/` |
 
@@ -63,6 +64,7 @@ On first run in a new project, `ai-spec` must execute **Repo Init**: read or cre
 | Project workflow bootstrap | `sam-dev-cc-init` | PDCO loop files (CLAUDE.md/PROGRESS-LOG/TASKS/self.opt) |
 | Computational dry-lab research | `ai4s-dry-lab` | SPEC-driven OODA loop with W1-W4 enforcement |
 | Methodology extraction | `extract-research-framework` | Reusable research framework templates |
+| Full-stack security audit | `security-audit` | Evidence-graded findings under `.debug/` (audit-only, no fixes) |
 | CI/CD or release | `gh-actions-architect` / `nodejs-npm-auto-release` | Validated workflow or npm release path |
 
 ---

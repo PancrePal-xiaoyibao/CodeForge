@@ -33,6 +33,7 @@ For external information tasks (tech selection, literature, competitor scans), i
 | Project workflow bootstrap | `sam-dev-cc-init` | PDCO loop files |
 | Computational dry-lab research | `ai4s-dry-lab` | SPEC-driven OODA loop (W1-W4) |
 | Methodology extraction | `extract-research-framework` | Reusable research framework templates |
+| Full-stack security audit | `security-audit` | Evidence-graded findings under `.debug/` (audit-only, no fixes) |
 | CI/CD or release | `gh-actions-architect` / `nodejs-npm-auto-release` | Workflow or release automation |
 
 Every development task follows `Archive → Develop → Test → Update plan → commit/push only with explicit authorization`.
@@ -58,6 +59,7 @@ Every development task follows `Archive → Develop → Test → Update plan →
 - **sam-dev-cc-init** — PDCO loop development workflow initialization (CLAUDE.md/PROGRESS-LOG.md/TASKS.md/self.opt).
 - **ai4s-dry-lab** — End-to-end AI4S dry-lab research engine: SPEC-driven, OODA loop, Gate control, W1-W4 mandatory records.
 - **extract-research-framework** — Reverse-extract reusable research methodology frameworks from deep-research documents.
+- **security-audit** — Full-stack security audit: codebase graph embed + stack-surface static audit + dependency CVE + public/internal pentest, evidence-graded report (audit-only, no fixes).
 - **ralph** / **ralph-yolo** — Autonomous PRD execution loops.
 - **ux-experience-audit** — User-journey-driven UX scanning and cross-layer fix loop.
 - **loop-engineer** — Multi-skill package design: asset audit, gap analysis, orchestration layer.

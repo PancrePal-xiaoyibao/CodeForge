@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Audit"
+  short_description: "全栈安全审计 — codebase 图谱嵌入 + 技术栈分面静态审计 + 依赖 CVE 比对 + 公网/内网渗透，证据驱动分级报告。只审计不修复。"
+  default_prompt: "Use $security-audit to run a full-stack security audit on this repository: embed the codebase knowledge graph, audit by stack surface, check dependency CVEs, probe public and internal attack paths, and produce an evidence-backed severity-graded report under .debug/. Audit-only, no fixes."
