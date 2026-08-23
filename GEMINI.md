@@ -16,6 +16,7 @@ For external information tasks (tech selection, literature, competitor scans), i
 
 | Scenario | Route | Output |
 |----------|-------|--------|
+| New machine / host onboarding | `dev-host-init` → `dev-env-scan` → `ai-spec` | Host bootstrap + injection doc + environment profile |
 | New repository / first agent run | `dev-env-scan` → `ai-spec` | Environment profile + project workflow |
 | Vague requirement | `intent-grill` → `ai-spec` | Clarified spec |
 | External info / tech selection / literature | `deep-research` → `ai-spec` | Structured research + citations |
@@ -45,6 +46,7 @@ Every development task follows `Archive → Develop → Test → Update plan →
 - **ai-spec** — Full-stack architect & AI instruction optimizer. Translates natural-language requirements into production-ready specs and "god prompts".
 - **deep-research** — Multi-agent parallel research engine for tech selection, literature, and competitor scans; supports citation management and lightweight quantitative validation.
 - **dev-env-scan** — Detects local toolchain (OS, languages, package managers, GPU, containers) and interactively collects developer preferences.
+- **dev-host-init** — One-command host bootstrap for a new machine: cross-platform environment probe, dev-tool gap checklist, codebase-memory-mcp deployment guidance, and a generated global/project injection doc (universal dev rules + machine-detected facts). Reachable via `/ai-spec init`.
 - **intent-grill** — Alignment interrogator, one-question-at-a-time. Maintains CONTEXT.md (domain glossary + relationships + ambiguities).
 - **api-first-modular** — Enforces three-layer separation (Frontend / BFF / Backend API packages) and the 5-step backend loop.
 - **code-debugger** — Context-first debugging. Maintains `.debug/` documentation.

@@ -16,6 +16,7 @@ description: 将自然语言需求转换为生产级技术规范和 AI 执行指
 - 输出必须达到生产级（Production-Ready）标准
 - 包含完整的实现约束（错误处理、测试、安全、性能）
 - 生成的指令应足够详细，AI 可直接执行无需额外澄清
+- **`/ai-spec init` 或新机器 onboarding → 转交 `dev-host-init`**：宿主机级初始化（环境探测/缺口提醒/codebase-memory-mcp 部署/生成全局注入文档）由 `dev-host-init` skill 执行，本命令专注项目级需求→SPEC。
 - **生成的 AI 执行指令必须包含 Repo Init**：先检查 `AGENTS.md` / `CLAUDE.md` / `GEMINI.md` / `README.md` / `docs/`，提取或补齐项目哲学、必读文档、开发者偏好、硬件环境、编码约定、测试命令、踩坑记录和审批边界。
 - **生成的 AI 执行指令必须包含五步开发闭环**：`归档 -> 开发 -> 测试 -> 更新计划 -> 授权后 commit/push`；旧内容优先移入 `_archived/`，计划文档和踩坑记录必须同步更新。
 - **生成的 AI 执行指令中必须包含 Checkfix 闭环**：每阶段/每次代码变更后按技术栈执行自动检查（如 Python: ruff/black；前端: npm run lint；Rust: cargo check 等），作为最基础的代码开发工作流，不可省略

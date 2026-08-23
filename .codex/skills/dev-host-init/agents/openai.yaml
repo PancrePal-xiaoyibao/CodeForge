@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev Host Init"
+  short_description: "宿主机一键初始化：环境探测 + 开发环境缺口提醒 + codebase-mcp 部署提醒 + 通用开发规则注入文档生成"
+  default_prompt: "使用 $dev-host-init 把本机初始化为合格开发主机：探测环境、提醒补装缺失工具、部署 codebase-memory-mcp、生成全局注入文档。"

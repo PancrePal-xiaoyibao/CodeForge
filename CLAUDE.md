@@ -22,6 +22,7 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 
 | 场景 | 推荐路径 | 结果 |
 |------|----------|------|
+| 新机器 / 宿主机 onboarding | `/dev-host-init` → `/dev-env-scan` → `/ai-spec` | 一键初始化 + 注入文档 + 环境画像 |
 | 新仓库 / 首次运行 Agent | `/dev-env-scan` → `/ai-spec` | 环境画像 + 项目工作流 |
 | 需求模糊 | `/intent-grill` → `/ai-spec` | 对齐后的技术规范 |
 | 需要外部信息 / 技术选型 / 文献调研 | `/deep-research` → `/ai-spec` | 结构化调研报告 + 引用 |
@@ -50,6 +51,7 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 | `/ai-spec` | 主调度 — 需求分诊 + 技术规范生成 |
 | `/deep-research` | 多 agent 并行深度调研（技术选型、文献、竞品） |
 | `/dev-env-scan` | 开发环境扫描 + 偏好配置（输出 `.dev-profile.json` + CLAUDE.md 段落） |
+| `/dev-host-init` | 宿主机一键初始化 — 环境探测+缺口提醒+codebase-mcp 部署提醒+注入文档生成（全局/项目，`/ai-spec init` 可触发） |
 | `/intent-grill` | 需求追问对齐 — 逐分支追问至共识，维护 CONTEXT.md |
 | `/api-first` | Activate the API-First modular development framework |
 | `/debug` | Context-first code debugging (maintains `.debug/` records) |
