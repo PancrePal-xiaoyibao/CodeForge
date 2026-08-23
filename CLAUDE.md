@@ -78,6 +78,8 @@ Every skill lives in `.claude/`, `.codex/`, and `.gemini/` mirrors so **any** of
 
 ## 🔒 Core Development Rules
 
+0. **Think before act（最高优先级，凌驾一切流程之上）** — 写代码/执行任务不是机械完成指令，而是先动脑子、综合判断**项目（架构/契约/并行状态）、环境（容器/数据/网络）、需求（字面+背后目的）、目的（任务在工作流的位置决定交付标准）、用户体验（产出价值密度 > 数量）** 五件事再动手。三条红线：(a) 不判根因就动手——很多"问题"是预期行为/遗留噪音，区分"真故障"和"设计行为"再决定动不动；(b) 不做综合判断就给主人甩半成品——该自己基于事实下判断的别让主人下，给「结论+依据+可执行下一步」而非「信息罗列+甩问题」，让主人做选择题不做问答题；(c) 为完成而完成、忽视产出价值——假绿的全面比不测更危险，宁可少而准不要多而假。判定速查：动手前能一句话说清"为什么这么做、不这么做怎样、对谁有何影响"？
+
 1. **API-First (mandatory)** — Frontend/backend work follows three-layer separation (Frontend / BFF / Backend API packages). Every backend feature must complete the 5-step loop: **Implement → Checkfix → Encapsulate → Expose API → Document API**.
 2. **Layer-scoped debugging** — Always identify the bug's owning layer (backend / frontend / BFF / contract mismatch) before making any fix. Never patch one layer to work around another layer's bug.
 3. **Cross-layer task decomposition** — Requirements spanning multiple layers must be split into ordered sub-tasks along API boundaries — backend first → API docs → frontend consumption → integration verification.
