@@ -19,7 +19,7 @@ On first run in a new project, `ai-spec` must execute **Repo Init**: read or cre
 | `ai-spec` | Natural-language requirements → precise technical spec translation | `.codex/skills/ai-spec/` |
 | `deep-research` | External information gathering, tech selection, literature, competitor scans | `.codex/skills/deep-research/` |
 | `dev-env-scan` | New project environment scan, preferences, onboarding | `.codex/skills/dev-env-scan/` |
-| `dev-host-init` | One-command host bootstrap: env probe + dev-tool gap checklist + codebase-mcp deploy guidance + injection doc generation | `.codex/skills/dev-host-init/` |
+| `dev-host-init` | One-command host bootstrap: env probe + dev-tool gap checklist + codebase-mcp deploy guidance + layered injection system generation (rules doc + agent-reference refs + pi reinforcement: APPEND_SYSTEM + hard-gate extension) | `.codex/skills/dev-host-init/` |
 | `intent-grill` | Requirement disambiguation, CONTEXT.md maintenance | `.codex/skills/intent-grill/` |
 | `project-health-audit` | Pre-change health/debt baseline for refactoring, migration, major features | `.codex/skills/project-health-audit/` |
 | `prd` | Generate structured PRD documents | `.codex/skills/prd/` |
@@ -48,7 +48,7 @@ On first run in a new project, `ai-spec` must execute **Repo Init**: read or cre
 
 | Scenario | Route | Output |
 |----------|-------|--------|
-| New machine / host onboarding | `dev-host-init` → `dev-env-scan` → `ai-spec` | Host bootstrap + injection doc + environment profile |
+| New machine / host onboarding | `dev-host-init` → `dev-env-scan` → `ai-spec` | Host bootstrap + layered injection + environment profile |
 | New repository / first agent run | `dev-env-scan` → `ai-spec` | Environment profile + initialized project workflow |
 | Vague requirement | `intent-grill` → `ai-spec` | Clarified intent + technical spec |
 | External info / tech selection / literature | `deep-research` → `ai-spec` | Structured research + citations |
