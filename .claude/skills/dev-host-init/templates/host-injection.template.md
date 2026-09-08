@@ -5,6 +5,8 @@
        RULES 段       → 规则主文档：AGENTS.md / CLAUDE.md / GEMINI.md（多镜像逐字一致）
                        只装行为规则 + 外置参考触发表，参考型数据一律外置，禁止回填。
        ENVIRONMENT 段 → agent-reference/environment.md（B 层机器探测画像，外置参考）
+       TOOLING 段     → agent-reference/tooling.md（图谱工具使用指南：CLI 速查/场景映射/三层
+                       fallback 状态机/反例/决策树，外置参考）
        APPEND 段      → .pi/agent/APPEND_SYSTEM.md（pi 平台 system prompt 尾部强化摘要）
 
      配套部署（非本模板渲染）：templates/graph-first-gate.ts → .pi/agent/extensions/
@@ -98,7 +100,7 @@
 | 环境搭建、依赖、硬件容量、Conda/uv、代理或语言选择 | {{REFERENCE_DIR}}/environment.md（含本机硬件、代理、环境速查与三平台路径表） |
 | 公网、域名、TLS、FRP、nginx、SSH、端口排障或部署 | {{REFERENCE_DIR}}/network.md（本机未自建时按权威来源自查） |
 | 科研配色、可视化规范 | {{REFERENCE_DIR}}/visualization.md（本机未自建时按权威来源自查） |
-| 图谱工具使用、CLI 不可用、Shell 或依赖构建故障 | {{CODEBASE_MCP_DOCS}} |
+| 图谱工具使用、CLI 不可用、Shell 或依赖构建故障 | {{REFERENCE_DIR}}/tooling.md（init 生成：CLI 速查/场景映射/三层 fallback/反例/决策树） |
 
 ## 8. 本规则维护
 
@@ -160,6 +162,110 @@ git config --global https.proxy http://{{PROXY_HTTP_HOSTPORT}}
 - **前端/Office/文档**: JS/Node + TypeScript，包括 PPTX/DOCX 等办公文档生成
 - **应用开发**: Rust 或 Go，追求优雅和性能
 - **原则**: 新项目 Python 用 uv，已有 conda 环境直接复用，不重复造轮子
+
+<!-- ===================== [TOOLING] 外置参考：agent-reference/tooling.md ===================== -->
+
+# 图谱工具使用指南（agent-reference/tooling.md）
+
+> 本文件由 dev-host-init 生成，属参考型数据：命中「图谱工具使用 / CLI 不可用 / Shell 或依赖构建故障」任务时读取，不常驻注入。
+> codebase-memory-mcp 的知识图谱是代码关系的结构化完整视图。查询图谱替代逐文件阅读，每少一次 `read` 调用就是约 **99% 的 token 节省**。
+>
+> **先问图谱，再无细节，最后才读文件。**
+
+## CLI 速查
+
+```bash
+# 1. 查已索引项目（后续查询的 project 参数用返回的 name 字段）
+codebase-memory-mcp cli list_projects
+
+# 2. 未索引则建（--mode: full=全量+相似/语义边 / moderate / fast；--persistence true 生成团队共享 .codebase-memory/graph.db.zst）
+codebase-memory-mcp cli index_repository --repo-path {{DEV_ROOT}}/<项目> --mode full
+
+# 3. 查询（推荐 stdin 写法，对所有工具通用）
+echo '{"project":"项目名","name_pattern":".*Handler.*","label":"Function"}' | codebase-memory-mcp cli search_graph
+echo '{"project":"项目名","function_name":"Search","direction":"both"}' | codebase-memory-mcp cli trace_path
+echo '{"project":"项目名","query":"MATCH (f:Function) RETURN f.name LIMIT 5"}' | codebase-memory-mcp cli query_graph
+```
+
+> 部署/细节见 {{CODEBASE_MCP_DOCS}}（cli 不在 PATH 时按文档激活，或直接用 MCP 工具）。
+
+## 场景 → 工具映射（必选路径）
+
+| 你想知道 / 你要做的事 | 调用的 MCP 工具 | 说明 |
+|---|---|---|
+| 这个项目整体结构？语言、包、入口、路由 | `get_architecture()` | 一次调用，给你全景 |
+| 这个函数/类被谁调用了？ | `trace_path(function_name, direction="inbound")` | 入向调用链，depth 可达多层 |
+| 这个函数调用了谁？ | `trace_path(function_name, direction="outbound")` | 出向调用链 |
+| 找名字带 X 的函数/类/方法 | `search_graph(name_pattern=".*X.*", label=["Function","Class"])` | 支持 regex 匹配 |
+| 两类代码之间的关系（继承/实现/调用） | `query_graph("MATCH (a)-[:INHERITS\|IMPLEMENTS\|CALLS]->(b) WHERE a.name = 'X'")` | 类 Cypher 语法 |
+| 源码里搜关键词 | `search_code(pattern="TODO")` | 图谱增强的 grep |
+| 只记得功能不记得名字 | 先用 `search_graph(name_pattern)`，必要时 `semantic_query` | 语义搜索兑底 |
+| 看某个函数/类的具体代码 | `get_code_snippet(qualified_name)` | 仅拿该 symbol 的几行，不加载整个文件 |
+| 改了代码，影响范围？ | `detect_changes()` | git diff → 风险映射 |
+| 检查文件/路径有没有被索引 | `check_index_coverage(path)` | 先查后读，避免读未索引文件 |
+| 获取索引统计（节点、边、标签） | `get_graph_schema(project)` | 了解项目规模 |
+
+## 强制执行顺序（三层 fallback 状态机）
+
+```
+Layer 1 — 图谱查询（必须优先）
+   调用：search_graph / trace_path / get_code_snippet / query_graph / get_architecture
+   项目未索引 / 索引过期？ → 先走 Layer 2，完成后回到本层
+   不满足 ↓（仅当图谱确实无法回答）
+
+Layer 2 — 索引保障（未索引 / embedding 过期时）
+   未索引：index_repository 建索引（repo_path=项目根，模式按规模选 full/moderate/fast）
+   过期（代码比索引新）：detect_changes 检查影响，或 index_repository 重新索引
+   完成后回到 Layer 1 —— 不允许索引完直接读文件
+
+Layer 3 — 直读兑底（final fallback）
+   先 check_index_coverage(path) 确认已索引
+   然后 read(path) 读具体文件/行号
+```
+
+### 🔒 硬约束
+
+- **不允许**跳过 Layer 1 直接 read/grep 代码文件（非代码文件不受限）
+- **不允许**索引建成后不查图谱直接读
+- **不允许**在任何能调用 Layer 1 工具的场合直接 `ls` 或 `read` 代码文件
+- 当 trace / search 返回空结果时，**先检查参数是否正确**（函数名拼写、label 类型、过滤条件），而不是立即 fallback 到读文件
+- pi 平台由 graph-first-gate 扩展硬性拦截执行；其他平台靠本规则自律
+
+## 常见反例（禁止的行为 🚫）
+
+| ❌ 别这样做 | ✅ 应该这样做 |
+|---|---|
+| `read src/handler/order.ts` 逐行读文件 | `trace_path("processOrder", direction="inbound")` |
+| `ls src/services/` 然后挨个读 | `get_architecture()` 获取全貌 |
+| `grep -r "validate" src/` | `search_code(pattern="validate")` |
+| 用 `read` 看函数实现 | `get_code_snippet("validateOrder")` |
+| 手动追踪调用链 `read fileA → read fileB → ...` | `trace_path("main", direction="outbound", depth=5)` |
+| 搜不到就说“没找到这个文件”然后放弃 | 先用 `search_graph` 确认 symbol 是否存在，或用 `search_code` 搜索关键词 |
+
+## 注意事项
+
+1. **`trace_path` 和 `search_graph` 返回空时**：先检查参数（函数名拼写、label 类型、方向），不是直接跳过图谱去读文件
+2. **`get_code_snippet`**：只返回 symbol 本体代码，不包含上下文；如果需要看实现细节，先 snippet 再 `read` 指定行号范围
+3. **`query_graph`**：是最灵活的底层查询工具，任何图谱层面找关系的问题都可以用它
+4. **不确定 symbol 名称**：先用 `search_graph(name_pattern=".*")` 搜到准确名字
+5. **同时涉及多个文件的改动**：用 `detect_changes()` 定位影响范围，再针对重点 symbol 用 `trace_path`
+6. **未索引的文件**：如果 `check_index_coverage` 说未索引，需要先索引项目，不要直接读取大段源码
+
+## 快速决策树
+
+```
+┌─ 我想了解代码关系 ──────────────────────┐
+│                                           │
+│  1. 项目全景？          → get_architecture │
+│  2. 调用链？（谁调了/调了谁）→ trace_path    │
+│  3. 找函数/类？         → search_graph    │
+│  4. 搜关键词？           → search_code     │
+│  5. 关系查询？（继承/调用等）→ query_graph  │
+│  6. 看具体实现？         → 先 Layer 1-2    │
+│                         再 get_code_snippet│
+│                         最后 read (行级)   │
+└───────────────────────────────────────────┘
+```
 
 <!-- ===================== [APPEND] pi 平台尾部强化：.pi/agent/APPEND_SYSTEM.md ===================== -->
 

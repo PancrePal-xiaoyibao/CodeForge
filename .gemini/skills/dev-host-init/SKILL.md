@@ -12,10 +12,9 @@ description: 宿主机一键初始化 — 新机器（Linux/macOS/Windows）环�
 | 层 | 产物 | 写入目标（按平台） | 性质 |
 |---|---|---|---|
 | 规则主文档 | `AGENTS.md` 正文 | 通用 `AGENTS.md` + 各 agent 镜像（`CLAUDE.md` / `AGENTS.md`(codex) / `GEMINI.md`），多镜像逐字一致 | 行为规则 + 外置参考触发表，~84 行级，参考型数据禁止入内 |
-| 外置参考 | `environment.md` | `agent-reference/` 目录（全局或项目级） | B 层机器探测画像：硬件/代理/环境速查/三平台路径表/个人偏好；触发式读取 |
+| 外置参考 | `environment.md` + `tooling.md` | `agent-reference/` 目录（全局或项目级） | B 层机器探测画像：硬件/代理/环境速查/三平台路径表/个人偏好；图谱工具指南：CLI 速查/场景映射/三层 fallback 状态机/反例/决策树；均触发式读取 |
 | pi 强化层 | `APPEND_SYSTEM.md` + `graph-first-gate.ts` | `.pi/agent/` 与 `.pi/agent/extensions/`（仅探测到 pi 时部署） | system prompt 尾部铁律摘要 + 硬闸门扩展（拦截跳层直读 + 逐轮注入） |
 | 自填区 | `agent-reference/` 内其余参考 | network.md / visualization.md 等由用户按需自建 | C 层占位：init 不生成，触发表已自洽（不存在则查权威来源） |
-
 > 平台继承关系：pi 在 skill 层面全量继承 .claude（共享 `~/.agents/skills/` 等发现路径），因此本 skill 与注入规则对 pi 同样生效；pi 特有的强化层（APPEND_SYSTEM + 闸门扩展）是对 .claude 规则的超集加固，不是分叉。
 
 ## 与相邻 skill 的分工
@@ -89,7 +88,7 @@ pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.
 
 ### Phase 5: 渲染分层注入体系
 
-读取 `templates/host-injection.template.md`，先按段标记切分（三个段标记只以下方「=====」分隔注释行形式出现，按行首 `<!-- ===== [段名]` 匹配：RULES / ENVIRONMENT / APPEND），逐段渲染：
+读取 `templates/host-injection.template.md`，先按段标记切分（四个段标记只以下方「=====」分隔注释行形式出现，按行首 `<!-- ===== [段名]` 匹配：RULES / ENVIRONMENT / TOOLING / APPEND），逐段渲染：
 
 | 占位符 | 渲染来源 | 探测不到时兜底 |
 |---|---|---|
@@ -106,9 +105,10 @@ pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.
 渲染与写入顺序：
 
 1. **RULES 段** → 写通用 `AGENTS.md`，再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）
-2. **ENVIRONMENT 段** → 写 `agent-reference/environment.md`（目录不存在则创建；network/visualization 等其余参考不生成，触发表已自洽）
-3. **APPEND 段** → 探测到 pi（`~/.pi` 或 `%USERPROFILE%\.pi`）时写 `.pi/agent/APPEND_SYSTEM.md`；同时把 `templates/graph-first-gate.ts` 复制到 `.pi/agent/extensions/`（已存在且 md5 不同时提示用户 diff 决定）；提示 `pi` 重启或 `/reload` 生效
-4. **全产物检查**：每个写出的文件不允许残留任何 `{{`；镜像间 cmp 一致
+2. **ENVIRONMENT 段** → 写 `agent-reference/environment.md`（目录不存在则创建）
+3. **TOOLING 段** → 写 `agent-reference/tooling.md`（图谱工具指南：CLI 速查/场景映射表/三层 fallback 状态机/反例/决策树，含 {{DEV_ROOT}} 与 {{CODEBASE_MCP_DOCS}} 渲染）
+4. **APPEND 段** → 探测到 pi（`~/.pi` 或 `%USERPROFILE%\.pi`）时写 `.pi/agent/APPEND_SYSTEM.md`；同时把 `templates/graph-first-gate.ts` 复制到 `.pi/agent/extensions/`（已存在且 md5 不同时提示用户 diff 决定）；提示 `pi` 重启或 `/reload` 生效
+5. **全产物检查**：每个写出的文件不允许残留任何 `{{`；镜像间 cmp 一致（network/visualization 等其余参考不生成，触发表已自洽）
 
 ### Phase 6: 写入 + 报告（含备份与分层增量）
 
@@ -125,7 +125,7 @@ pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.
 
 ## 输出契约
 
-- 分层注入体系一套：规则主文档 1-N 份镜像（逐字一致、无裸 `{{}}`）+ `agent-reference/environment.md` 1 份 + pi 强化层（条件部署）
+- 分层注入体系一套：规则主文档 1-N 份镜像（逐字一致、无裸 `{{}}`）+ `agent-reference/environment.md` 与 `agent-reference/tooling.md` 各 1 份 + pi 强化层（条件部署）
 - 环境探测 JSON（可存 `~/.dev-host-profile.json` 供 dev-env-scan / code-debugger 复用）
 - 缺口清单 + 安装状态 + 下一步建议
 
