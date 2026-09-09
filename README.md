@@ -212,6 +212,8 @@ npm install -g @google/gemini-cli && gemini
 
 Agent 会自动完成 git clone → 部署脚本 → 验证。**部署完成后，`/ai-spec` `/deep-research` `/api-first` 等 16+ 命令立即可用。**
 
+> 💡 **部署后第一步（最佳实践）**：新机器 / 新项目 onboarding 时，在 Agent 会话里跑一次 **`/ai-spec init`** —— 它会自动探测本机环境、补齐开发工具，并把 CodeForge 的**全量注入文档**（规则铁律 + 环境画像 + 配色 + 网络拓扑等，~400 行性能全量档）写入 `~/.claude/CLAUDE.md` / `AGENTS.md` 及各 agent 镜像，让 Agent 后续行为完整遵守项目约定。之后任何需求都从 `/ai-spec` 主调度进入。
+
 <details>
 <summary><b>🅱️ B 类 · 用 OpenClaw / Hermes (hermas) / WorkBuddy？点这里展开分流提示词</b></summary>
 
