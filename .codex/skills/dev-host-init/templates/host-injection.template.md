@@ -188,12 +188,93 @@
 ## 2. 事实源与代码发现
 
 - 进入项目先读适用的项目规则；代码结构探索先查 codebase-memory 索引，未索引优先建 full 索引。
-- 顺序：图谱定位 → 符号源码 → 必要的精准文件读取。❌ 未经图谱定位（search_graph / search_code / query_graph / trace_path）不得直接 grep 或整读源码文件；符号与引用关系问题优先 get_code_snippet / trace_path，行段直读仅限图谱已定位到行号之后。工具名和参数以当前实际 schema 为准，不调用假想工具。
+- 顺序：图谱定位 → 符号源码 → 必要的精准文件读取。❌ 未经图谱定位（search_graph / search_code / query_graph / trace_path）不得直接 grep 或整读源码文件；符号与引用关系问题优先 get_code_snippet / trace_path，行段直读仅限图谱已定位到行号之后。工具名以**功能**为准，调用名当前部署 codebase-memc 若有出入，按功能定位实际 schema；不调用假想工具。
 - 图谱空结果先检查项目名、参数、索引状态；图谱不可用、过期或不含未提交变更时，简述原因后用 git diff、rg 和精准源码读取继续。
 - 图谱是导航，不是永远正确的事实源。审计/修改前核对实际文件、符号和 diff；配置、文档、日志可直接精准搜索。
 - 判断"有没有某机制/数据/权限"前查权威接口、运行配置、状态机和日志。空字段 ≠ 全系统缺数据；业务校验错误 ≠ 服务器故障。
 - 区分代码实现、实际部署、运行状态和报告推断；时效性数据注明来源与截止时间。无法获取权威数据时明确缺口，不用邻近接口或旧数据冒充。
 - MCP 调用按真实 schema 填参；错误先辨别权限、输入、业务状态、依赖或服务异常，再采取对应动作。
+
+### 2.1 场景 → 工具映射（必选路径）
+
+> 工具名均为「参考名」（以当前实际部署的 codebase-memory MCP schema 为准；名称随项目更新可能调整，**按功能定位**，agent 应自行发现实际调用名）。
+
+| 你想知道 / 你要做的事 | 参考工具（按功能） | 说明 |
+|---|---|---|
+| 这个项目整体结构？语言、包、入口、路由 | `get_architecture()` | 一次调用，给全景 |
+| 这个函数/类被谁调用了？ | `trace_path(direction="inbound")` | 入向调用链，depth 可达多层 |
+| 这个函数调用了谁？ | `trace_path(direction="outbound")` | 出向调用链 |
+| 找名字带 X 的函数/类/方法 | `search_graph(name_pattern=.*X.*)` + `label` 过滤 | 支持 regex 匹配 |
+| 两类代码之间的关系（继承/实现/调用） | `query_graph()`（Cypher） | 最灵活底层查询，任何图谱关系 |
+| 源码里搜关键词 | `search_code()` | 图谱增强的 grep |
+| 只记得功能不记得名字 | `search_graph(name_pattern)` + `semantic_query` | 语义搜索兜底 |
+| 看某个函数/类的具体代码 | `get_code_snippet(qualified_name)` | 仅拿该 symbol，不加载整文件 |
+| 改了代码，影响范围？ | `detect_changes()` / 图谱定位受影响符号 | git diff → 风险映射 |
+| 检查文件/路径有没有被索引 | `index_status` / 项目索引状态 | 先查后读，避免读未索引文件 |
+| 列出目录结构 | 图谱定位后精准 `read` / `ls`（非代码文件） | 替代整目录扫描 |
+| 获取索引统计（节点、边、标签） | `get_graph_schema()` | 了解项目规模 |
+
+### 2.2 强制执行顺序（3 级阶梯）
+
+```
+Level 1 — 图谱查询（必须优先）
+   调用：trace_path / search_graph / query_graph / get_architecture
+   不满足 ↓
+
+Level 2 — 精准代码片段（仅当 Level 1 不够）
+   调用：get_code_snippet(qualified_name) 获取 symbol 级代码
+   不满足 ↓
+
+Level 3 — 逐文件阅读（final fallback）
+   先确认项目已索引（未索引建 full 索引）
+   再按图谱/路径定位到目标行号
+   最后 read(path) 读具体文件
+```
+
+### 🔒 硬约束
+
+- **不允许**直接从 Level 1 跳到 Level 3
+- **不允许**在任何能调用 Level 1/2 工具的场合直接 `ls` 或整读代码文件
+- 当 trace / search 返回空结果时，**先检查参数是否正确**（项目名、函数名拼写、label 类型、过滤条件），而不是立即 fallback 到读文件
+- 工具名按功能定位；参考名与实际 schema 出入时以实际为准，不硬凑假想工具名
+
+### 2.3 常见反例（禁止的行为 🚫）
+
+| ❌ 别这样做 | ✅ 应该这样做 |
+|---|---|
+| `read` 逐行读代码文件 | 图谱定位（trace_path / search_graph） |
+| `ls` 目录后挨个读 | `get_architecture()` 获取全貌 |
+| `grep -r` 在代码库 | `search_code()` 图谱增强 grep |
+| 用 `read` 看函数实现 | `get_code_snippet(qualified_name)` |
+| 手动追踪调用链 `read A → read B → ...` | `trace_path(outbound/inbound)` |
+| 搜不到就说"没找到"然后放弃 | 先 `search_graph` 确认 symbol，或 `search_code` 搜关键词 |
+
+### 2.4 注意事项
+
+1. **trace_path / search_graph 返回空时**：先检查参数（项目名、函数名拼写、label 类型、方向），不是直接跳过图谱去读文件
+2. **get_code_snippet**：只返回 symbol 本体，不含上下文；需要细节先 snippet 再 `read` 指定行号范围
+3. **query_graph**：最灵活，任何图谱层面找关系的问题都用它
+4. **不确定 symbol 名称**：先 `search_graph(name_pattern=".*")` 搜到准确名字
+5. **同时涉及多个文件的改动**：图谱定位影响范围，再针对重点 symbol 用 `trace_path`
+6. **未索引的项目**：先 `index_repository` 建索引，不要直接读取大段源码
+7. **工具名随 MCP 项目更新会变**：一律按"功能"找调用名，不硬编码旧名
+
+### 2.5 快速决策树
+
+```
+┌─ 我想了解代码关系 ──────────────────────┐
+│  1. 项目全景？            → get_architecture │
+│  2. 调用链？（谁调了/调了谁）→ trace_path      │
+│  3. 找函数/类？           → search_graph    │
+│  4. 搜关键词？             → search_code     │
+│  5. 关系查询？（继承/调用等）→ query_graph     │
+│  6. 看具体实现？           → 先 Level 1-2     │
+│                           再 get_code_snippet│
+│                           最后 read (行级)    │
+└───────────────────────────────────────────┘
+```
+
+> ⚡ **图谱是导航，不是永远正确的审判官**。查询图谱替代逐文件阅读（每次 `read` ≈ 99% token 节省是量级感，非精确契约）；但图谱滞后 HEAD、缺失未提交 diff 时，以 git diff + 精准 read 为准，不要死守图谱硬着头皮猜。
 
 ## 3. 共享工作区与 Git
 

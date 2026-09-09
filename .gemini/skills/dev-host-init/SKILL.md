@@ -127,7 +127,8 @@ pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.
 1. **[性能档] 无脑铁律模式**：写 `AGENTS.md`（PERFORMANCE 段全量正文），再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）+ 写 `agent-reference/preferences.md`（问卷全量）
 2. **RULES 段（经济/超轻档）** → 写通用 `AGENTS.md`，再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）
 3. **ENVIRONMENT 段** → 写 `agent-reference/environment.md`（目录不存在则创建）
-4. **TOOLING 段** → 写 `agent-reference/tooling.md`（图谱工具指南：CLI 速查/场景映射表/三层 fallback 状态机/反例/决策树，含 {{DEV_ROOT}} 与 {{CODEBASE_MCP_DOCS}} 渲染）
+4. **TOOLING 段** → 写 `agent-reference/tooling.md`（图谱工具指南：CLI 速查/场景映射表/三层 fallback 状态机/反例/决策树，含 {{DEV_ROOT}} 与 {{CODEBASE_MCP_DOCS}} 渲染）；工具名一律按「功能」写参考名，并注明以当前实际部署 schema 为准
+4'. **[性能档] PERFORMANCE 段** → §2 完整 codebase 图谱用法（场景映射/3 级阶梯/硬约束/反例/注意事项/决策树，工具名按功能参考名），以 `.bak` 全量 1:1 复用为原则、经济/超轻档按比例精简
 5. **APPEND 段** → 探测到 pi（`~/.pi` 或 `%USERPROFILE%\.pi`）时写 `.pi/agent/APPEND_SYSTEM.md`；同时把 `templates/graph-first-gate.ts` 复制到 `.pi/agent/extensions/`（已存在且 md5 不同时提示用户 diff 决定）；提示 `pi` 重启或 `/reload` 生效
 6. **全产物检查**：每个写出的文件不允许残留任何 `{{`；镜像间 cmp 一致（network/visualization 等其余参考不生成，触发表已自洽）
 
