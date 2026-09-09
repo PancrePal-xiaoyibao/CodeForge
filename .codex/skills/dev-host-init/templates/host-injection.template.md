@@ -219,16 +219,16 @@ echo '{"project":"项目名","query":"MATCH (f:Function) RETURN f.name LIMIT 5"}
 | 你想知道 / 你要做的事 | 调用的 MCP 工具 | 说明 |
 |---|---|---|
 | 这个项目整体结构？语言、包、入口、路由 | `get_architecture()` | 一次调用，给你全景 |
-| 这个函数/类被谁调用了？ | `trace_call_path(name, direction="inbound")` | 入向调用链，depth 可达多层 |
-| 这个函数调用了谁？ | `trace_call_path(name, direction="outbound")` | 出向调用链 |
+| 这个函数/类被谁调用了？ | `trace_path(function_name, direction="inbound")` | 入向调用链，depth 可达多层 |
+| 这个函数调用了谁？ | `trace_path(function_name, direction="outbound")` | 出向调用链 |
 | 找名字带 X 的函数/类/方法 | `search_graph(name_pattern=".*X.*", label=["Function","Class"])` | 支持 regex 匹配 |
 | 两类代码之间的关系（继承/实现/调用） | `query_graph("MATCH (a)-[:INHERITS\|IMPLEMENTS\|CALLS]->(b) WHERE a.name = 'X'")` | 类 Cypher 语法 |
-| 源码里搜关键词 | `search_code(query="TODO\|FIXME")` | 图谱增强的 grep |
+| 源码里搜关键词 | `search_code(pattern="TODO")` | 图谱增强的 grep |
 | 只记得功能不记得名字 | 先用 `search_graph(name_pattern)`，必要时 `semantic_query` | 语义搜索兜底 |
-| 看某个函数/类的具体代码 | `get_code_snippet(name)` | 仅拿该 symbol 的几行，不加载整个文件 |
+| 看某个函数/类的具体代码 | `get_code_snippet(qualified_name)` | 仅拿该 symbol 的几行，不加载整个文件 |
 | 改了代码，影响范围？ | `detect_changes()` | git diff → 风险映射 |
-| 检查文件/路径有没有被索引 | `check_index_coverage(path)` | 先查后读，避免读未索引文件 |
-| 列出目录结构 | `list_directory(path)` | 替代 `ls` |
+| 检查文件/路径有没有被索引 | `search_code(files)`（files 模式）或 `index_status` | 先查后读，避免读未索引文件 |
+| 列出目录结构 | `search_code(files)` + `search_graph`（locate 文件）| 替代 `ls` |
 | 获取索引统计（节点、边、标签） | `get_graph_schema()` | 了解项目规模 |
 
 ---
@@ -237,16 +237,16 @@ echo '{"project":"项目名","query":"MATCH (f:Function) RETURN f.name LIMIT 5"}
 
 ```
 Level 1 — 图谱查询（必须优先）
-   调用：trace_call_path / search_graph / query_graph / get_architecture
+   调用：trace_path / search_graph / query_graph / get_architecture
    不满足 ↓
 
 Level 2 — 精准代码片段（仅当 Level 1 不够）
-   调用：get_code_snippet(name) 获取 symbol 级代码
+   调用：get_code_snippet(qualified_name) 获取 symbol 级代码
    不满足 ↓
 
 Level 3 — 逐文件阅读（final fallback）
-   先 check_index_coverage(path) 确认已索引
-   然后 list_directory(path) 定位
+   先搜索引擎确认文件已入索引（index_status / 图谱查询是否命中）
+   然后搜索路径下的文件名（search_code files 模式）定位
    最后 read(path) 读具体文件
 ```
 
@@ -262,23 +262,23 @@ Level 3 — 逐文件阅读（final fallback）
 
 | ❌ 别这样做 | ✅ 应该这样做 |
 |---|---|
-| `read src/handler/order.ts` 逐行读文件 | `trace_call_path("processOrder", direction="inbound")` |
+| `read src/handler/order.ts` 逐行读文件 | `trace_path(function_name="processOrder", direction="inbound")` |
 | `ls src/services/` 然后挨个读 | `get_architecture()` 获取全貌 |
-| `grep -r "validate" src/` | `search_code(query="validate")` |
+| `grep -r "validate" src/` | `search_code(pattern="validate")` |
 | 用 `read` 看函数实现 | `get_code_snippet("validateOrder")` |
-| 手动追踪调用链 `read fileA → read fileB → ...` | `trace_call_path("main", direction="outbound", depth=5)` |
+| 手动追踪调用链 `read fileA → read fileB → ...` | `trace_path(function_name="main", direction="outbound", depth=5)` |
 | 搜不到就说"没找到这个文件"然后放弃 | 先用 `search_graph` 确认 symbol 是否存在，或用 `search_code` 搜索关键词 |
 
 ---
 
 ## 四、注意事项
 
-1. **`trace_call_path` 和 `search_graph` 返回空时**：先检查参数（函数名拼写、label 类型、方向），不是直接跳过图谱去读文件
+1. **`trace_path` 和 `search_graph` 返回空时**：先检查参数（函数名拼写、label 类型、方向），不是直接跳过图谱去读文件
 2. **`get_code_snippet`**：只返回 symbol 本体代码，不包含上下文；如果需要看实现细节，先 snippet 再 `read` 指定行号范围
 3. **`query_graph`**：是最灵活的底层查询工具，任何图谱层面找关系的问题都可以用它
 4. **不确定 symbol 名称**：先用 `search_graph(name_pattern=".*")` 搜到准确名字
-5. **同时涉及多个文件的改动**：用 `detect_changes()` 定位影响范围，再针对重点 symbol 用 `trace_call_path`
-6. **未索引的文件**：如果 `check_index_coverage` 说未索引，需要先索引项目，不要直接读取大段源码
+5. **同时涉及多个文件的改动**：用 `detect_changes()` 定位影响范围，再针对重点 symbol 用 `trace_path`
+6. **未索引的文件**：如果 `search_code(files)` / `index_status` 说未索引，需要先索引项目，不要直接读取大段源码
 
 ---
 
@@ -288,7 +288,7 @@ Level 3 — 逐文件阅读（final fallback）
 ┌─ 我想了解代码关系 ──────────────────────┐
 │                                           │
 │  1. 项目全景？          → get_architecture │
-│  2. 调用链？（谁调了/调了谁）→ trace_call_path │
+│  2. 调用链？（谁调了/调了谁）→ trace_path │
 │  3. 找函数/类？         → search_graph    │
 │  4. 搜关键词？           → search_code     │
 │  5. 关系查询？（继承/调用等）→ query_graph  │
