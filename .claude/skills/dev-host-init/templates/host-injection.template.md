@@ -144,12 +144,12 @@
 |---|---|
 | 环境搭建、依赖、硬件容量、Conda、代理或语言选择 | {{REFERENCE_DIR}}/environment.md |
 | 公网、域名、TLS、FRP、nginx、SSH、端口排障或部署 | {{REFERENCE_DIR}}/network.md |
-| 科研配色、14 细胞图、Acupuncture/Dysentery 或 TC/MP/FC 可视化 | {{REFERENCE_DIR}}/visualization.md |
+| 视觉/图表/配色风格、演示或平面设计（**由 init 问卷按你的日常任务生成，可跳过可自定**） | {{REFERENCE_DIR}}/visualization.md |
 | 图谱工具使用、CLI 不可用、Shell 或依赖构建故障 | {{REFERENCE_DIR}}/tooling.md（init 生成：CLI 速查/场景映射/三层 fallback/反例/决策树） |
 
 网络硬约束：公网按既有 VPS+FRP/nginx 或 SSH 隧道方案；不得建议重开已关闭的西柚云 Web 映射。
 修改域名、证书、入口或 FRP 前读 network.md 中两份权威文档，修改后同步更新。
-配色硬约束：相关科研图保持 Acu 暖粉/Dys 冷紫，完整色值和亚群不重复规则按 visualization.md。
+视觉硬约束：**未在问卷中确定风格时不得替用户决定配色**；命中视觉任务先读 visualization.md（不存在则按任务现场确立并落盘，勿套用他域风格）。
 
 ## 8. 本规则维护
 
@@ -368,11 +368,9 @@ git config --global https.proxy http://{{PROXY_HTTP_HOSTPORT}}
 
 ## 个人开发偏好
 
-- **Python**: 优先 `uv venv` 管理虚拟环境，不用 conda（除非特定环境已存在）
-- **前端/Office/文档**: JS/Node + TypeScript，包括 PPTX/DOCX 等办公文档生成
-- **应用开发**: Rust 或 Go，追求优雅和性能
-- **生信/统计**: R 语言（虽然语言设计不佳，但生态成熟，package 出图一步到位）
-- **原则**: 新项目 Python 用 uv，已有 conda 环境直接复用，不重复造轮子
+- 领域与偏好画像以 init 问卷为准（作用域/规格/美术/部署均可跳过、可自定义）；问卷摘要常驻本节，完整问卷见 {{REFERENCE_DIR}}/preferences.md
+- **视觉/图表风格**：{{ART_STYLE_SUMMARY}}（按 init 问卷选择生成；未选则不落配色，命中视觉任务按 visualization.md 现场确立）
+- **开发工具部署**：本机已装工具与缺口/待部署命令见 {{REFERENCE_DIR}}/environment.md「开发工具部署计划」（init 问卷可跳过）
 
 **开发与领域偏好画像（问卷全量，每次 init 必跑）**：
 {{PREFERENCES_SUMMARY}}
@@ -449,100 +447,11 @@ commit 和 push 是需确认的动作（非自动）。但主人明示「该推�
 - **setuptools-scm 无 .git**：vendor 源码无 .git 目录时 setuptools-scm 推断版本失败。设 `SETUPTOOLS_SCM_PRETEND_VERSION=x.y.z` 环境变量
 - **qlib 依赖 mlflow**：`--no-deps` 装 qlib 会缺 mlflow，`qlib.init()` 必须 import mlflow。装 qlib 时至少补 `uv pip install mlflow`
 
-## 全局可视化配色方案 v6.0 — S2_暮紫樱粉
+## 视觉与配色基调（问卷驱动，可跳过）
 
-> 🎨 **设计主题**: 暮紫×粉樱 | 暖粉系(Acu 温煦) × 冷紫系(Dys 病理)
-> 📷 **颜色来源**: img3 参考图 32 色 k-means 提取(主) + img1×3 暖金 + img2×2 暖粉补充
-> 🕐 **生效时间**: 2026-06-23
-> 📂 **方案文档**: `docs/配色/img3/S2_14CT_README.md`
-> 📋 **R 代码**: `docs/配色/img3/S2_14CT_colors.R`
-
-### 分组配色 (Acupuncture vs Dysentery)
-
-```r
-GROUP_COLORS <- c(
-  "Control"     = "#99A9B7",  # 灰蓝 — 中性基线
-  "Acupuncture" = "#EA8CA9",  # 粉樱 — 针灸温煦激活
-  "Dysentery"   = "#5B519C"   # 暮紫 — 痢疾病理冷调
-)
-```
-
-### 14 细胞类型配色 (全局 UMAP / 气泡图 / 堆叠图)
-
-```r
-CT_COLORS_14 <- c(
-  "Telocytes"                  = "#DD7180",  # 珊瑚红 — 通讯枢纽视觉焦点
-  "Fibroblasts"                = "#F2C492",  # 蜜桃   — 结构基质温暖基底
-  "MyoFibroblasts"             = "#ECA264",  # 琥珀   — FC邻近稍暗区分
-  "Endothelial cells"          = "#398D92",  # 青绿   — 血管内皮
-  "Lymphatic endothelial cells" = "#155F76", # 深青   — 淋巴内皮更深
-  "Macrophages"                = "#2153B8",  # 宝蓝   — 免疫效应核心
-  "Dendritic cell"             = "#7D8586",  # 雾灰   — 抗原呈递低调
-  "Granulocytes"               = "#083065",  # 深藏青 — 粒细胞最深免疫
-  "Mast cells"                 = "#C293D4",  # 淡紫   — 肥大细胞
-  "B cells"                    = "#123A90",  # 藏蓝   — B细胞
-  "NK cells"                   = "#7A7EC4",  # 长春花 — NK细胞
-  "NKL T cells"                = "#AD70A0",  # 紫红   — NK/T过渡
-  "Plasma cells"               = "#EEABC4",  # 浅粉   — B终末分化
-  "T helper cells"             = "#EA8CA9"   # 粉樱   — 免疫辅助(Acu同色系)
-)
-```
-
-### 热图色阶
-
-```r
-HM_SEQ <- c("#F5E8DF", "#EEABC4", "#59455A")  # Sequential: 米白→浅粉→深紫
-HM_DIV <- c("#2153B8", "#F0F6F7", "#DD7180")  # Diverging:  宝蓝→白→珊瑚
-FEAT_COLORS <- c("#F5E8DF", "#59455A")         # FeaturePlot: 低表达→高表达
-```
-
-### 亚群渐变色板
-
-```r
-# TC 亚群 (TC1-5) — 暖粉梯: 米白→浅粉→粉樱→珊瑚 (img3)
-TC_SUB <- c("#F5E8DF", "#F6C5DE", "#EEABC4", "#EA8CA9", "#DD7180")
-
-# MP 亚群 (MP1-9) — 冷蓝紫梯: 雾白→浅蓝→宝蓝→长春花→暮紫→深蓝 (img3)
-MP_SUB <- c("#D1E2ED", "#BECAD2", "#99C2E7", "#61AADC",
-            "#3C78D3", "#2153B8", "#7A7EC4", "#5B519C", "#083065")
-
-# FC 亚群 (FC1-11) — 跨源暖色梯: 米白→桃→琥珀→金→褐→灰粉→粉紫→深紫
-# 来源: img3×6 + img1×3 + img2×2 (0重叠 TC/MP)
-FC_SUB <- c("#EEE4B8", "#EFD9BC", "#F2C492", "#ECA264", "#D6AE56",
-            "#CDB187", "#C8ABA3", "#ECD8D3", "#DEAFCA", "#AD70A0", "#59455A")
-```
-
-### 使用方式
-
-```r
-# 直接 source
-source("docs/配色/img3/S2_14CT_colors.R")
-
-# DimPlot
-DimPlot(fascia, group.by = "cellclusters2", cols = CT_COLORS_14)
-
-# FeaturePlot
-FeaturePlot(fascia, features = "Il6", cols = FEAT_COLORS)
-
-# DoHeatmap
-DoHeatmap(obj, group.colors = GROUP_COLORS) +
-  scale_fill_gradientn(colors = HM_SEQ)
-
-# 亚群 UMAP (TC/MP/FC 各自)
-DimPlot(tc_obj, cols = TC_SUB)
-DimPlot(mp_obj, cols = MP_SUB)
-DimPlot(fc_obj, cols = FC_SUB)
-
-# 热图 (Diverging: 差异分析)
-scale_fill_gradientn(colors = HM_DIV)
-```
-
-### 配色约束
-
-- ⚠️ 新增细胞类型必须从 img1/img2/img3 的 32 色全集中选取，禁止凭空造色
-- ⚠️ TC_SUB / MP_SUB / FC_SUB 之间不允许有任何颜色重叠（当前全部为 0）
-- ⚠️ 修改配色后需同步更新 `docs/配色/img3/S2_14CT_colors.R`
-- 🎨 Group colors 中 Acu 永远为暖粉系、Dys 永远为冷紫系，保持全文一致性
+> 本机的视觉/配色风格**由 init 问卷动态生成**：可选风格预设（工程冷静/科研学术/温暖人文/暗黑高级/自然生态/艺术活力）、可自填描述性种子自动配色，或直接跳过。生成物只写入 `agent-reference/visualization.md`（跳过则不生成），并在上文「个人开发偏好」回填一段 {{ART_STYLE_SUMMARY}} 摘要。
+>
+> ❌ **禁止**：未在问卷选择就替用户定色、或把本机某一单细胞项目的色板当作全局通用。命中任何图表/UI/PPT/平面设计任务时，先看 visualization.md；文件不存在则按任务场景现场确立并落盘，不套用他域风格。
 
 ---
 
@@ -641,10 +550,8 @@ git config --global https.proxy http://{{PROXY_HTTP_HOSTPORT}}
 
 ## 个人开发偏好（可改）
 
-- **Python**: 优先 `uv venv` 管理虚拟环境，不用 conda（除非特定环境已存在）
-- **前端/Office/文档**: JS/Node + TypeScript，包括 PPTX/DOCX 等办公文档生成
-- **应用开发**: Rust 或 Go，追求优雅和性能
-- **原则**: 新项目 Python 用 uv，已有 conda 环境直接复用，不重复造轮子
+- 领域与偏好画像以 init 问卷为准；问卷摘要常驻注入主文档，完整版在本文件所属 agent-reference/。
+- 视觉/图表/配色风格与开发工具部署计划见环境保护参考（environment.md / visualization.md）。
 
 <!-- ===================== [TOOLING] 外置参考：agent-reference/tooling.md ===================== -->
 

@@ -35,24 +35,57 @@ description: 宿主机一键初始化 — 新机器（Linux/macOS/Windows）环�
 3. **不留裸占位**：探测不到的 `{{占位符}}` 必须填明确兜底文案（如「未检测到，如需请手填」）
 4. **不覆盖**：目标产物已存在时先备份 `*.hostinit-bak.<时间戳>` 再写入；增量模式按「分层增量」规则处理（见 Phase 6）
 
-## 工作流（6 Phase + Phase 0 首问）
+## 工作流（6 Phase + Phase 0 强制问卷）
 
-### Phase 0: 作用域首问（强制，先于一切探测与渲染）
+### Phase 0: 强制完整问卷（先于一切探测/渲染/写入）
 
-**任何一次 init（含 `/ai-spec init`）开始后，第一件事就是问清作用域，不探测、不渲染、不写入。** 这是硬门：作用域决定"写哪儿、写几份镜像、是否部署 pi 强化层"，问错等于全盘重做（还可能污染用户仓库）。
+> 用户点名要渲染**全量 / 性能档 / 完整注入**时，**铁律全文是否完整不取决于问卷——性能档的 PERFORMANCE 段本就把动脑子/说人话/齐头并进/开源脱敏等铁律全文一次性固死在模板正文里（模板升级改的是铁律内容，不因问卷裁剪）**。问卷只决定"往模板里填什么动态内容"，绝不裁剪铁律本身。
 
-一次问齐（用 AskUserQuestion，不逐条打扰）：
+**任何一次 init（含 `/ai-spec init`）都必须跑完整问卷**，即使只差想跳过某一项也要显式选"跳过"。用 **AskUserQuestion 一次问齐**以下 5 组（每组附"可选/可跳过/可自填"）：不探测、不渲染、不写入。
 
-1. **作用域**：全局（本机所有项目共享，写入 `$HOME`/`%USERPROFILE%`）还是**项目级**（只写这个仓库，可入库）？
-2. **项目路径**：若选项目级 —— **目标目录是不是当前工作目录（cwd）？** 不是的话，请用户给出绝对路径。问完执行 `--dry-run` 把"将写入的绝对路径清单"回显给用户确认，**确认后才真写**。
-3. **项目级附加确认**：仓库若受 git 管理，说明产物会进入 `git status`（AGENTS.md / CLAUDE.md / GEMINI.md / agent-reference/ 四类），是否要顺手加进 `.gitignore` 或直接入库；项目级**不部署** pi 强化层（APPEND_SYSTEM / graph-first-gate 是 `~/.pi` 全局件）。
+**Q1 作用域（先问）**
+1. **作用域**：全局（写入 `$HOME`/`%USERPROFILE%`，本机所有项目共享）还是**项目级**（只写这个仓库，可入库）？
+2. **项目路径**：若项目级 → **目标目录是不是当前工作目录（cwd）？** 不是的话给绝对路径。先 `--dry-run` 回显"将写入路径清单"确认后真写。
+3. 项目级附加：git 管理的仓库说明产物会进 `git status`，是否 `gitignore` 或直接入库；项目级**不部署** pi 强化层。
 
-判断辅佐（可不问即推断，但推断结果要在报告里说明）：
-- 用户说"这台机器/新机器/开箱即用" → 全局
-- 用户说"这个项目/这个仓库/给这个 repo 加规则"或当前 cwd 就是一个仓库 → 项目级
-- 两者都想要 → 先全局（机器基线），再项目级（项目补充），分两次渲染
+**Q2 注入规格**（Phase 4 的反向合并）：性能（全量）默认 / 经济（分层）/ 超轻 / 自定义。性能全量时 PERFORMANCE 段铁律全文固写、不受问卷影响；经济/超轻只写 RULES 段（行为规则+触发表，参考外置）。
 
-`dev-host-init` 自身在**项目级模式下从项目内运行**（如 `.claude/skills/dev-host-init/`），因此"路径在 cwd 下"是最常见的默认答案，但**必须问，不许默认**。
+**Q3 美术/视觉风格（可跳过、可自填，绝不写死不替他域套用）**
+
+诉诸描述性风格而非唯一领域；**不默认等于"单细胞暖粉/冷紫"**。预设 6 档 + 可跳过 + 可自填：
+
+| 档位 | 语义 | 参数 |
+|---|---|---|
+| 工程冷静 · 深海蓝灰 | 低饱和蓝灰+冷强调，克制专业 | `engineering-calm` |
+| 科研学术 · 暖纸古蓝 | 米白纸底+古蓝/暗红，克制数据色谱 | `academic-muted` |
+| 温暖人文 · 焦糖暖橙 | 奶油底+焦糖/珊瑚，人文感强 | `warm-human` |
+| 暗黑高级 · 墨黑鎏金 | 近黑底+金/青极光，NV 高级感 | `dark-premium` |
+| 自然生态 · 苔绿雾松 | 苔绿+陶土/雾蓝，天然透气 | `nature-fresh` |
+| 艺术活力 · 钴蓝朱红 | 高饱和钴蓝+朱红，年轻张力 | `art-vivid` |
+
+- **可跳过**：`art_skip=true` → 注入正文给"未在 init 问卷选择（命中视觉任务按 visualization.md 现场确立）"，不落死色。
+- **可自填**：给一段争议性描述（"前端 Vue 仪表盘，深色科技感"…）→ 用 `tools-catalog.auto_palette` 的哈希→色相族 + CBDR 对比逻辑生成**初始提案**写入 visualization.md，用户可后续手调。**自填≠自动落库当最终答案**：先给提案、确认后写。
+- 生成：`visualization.md`（风格+主/强调/背景/正文+语义渐变）+ 注入正文 `ART_STYLE_SUMMARY` 一段。
+
+**Q4 工具部署偏好（可跳过；覆盖"源码/二进制/包管理器/官方安装器"全部路由）**
+
+对每个工具问**采用哪种安装方式**并给出一键命令（含真实下载源，查证于官方与 `E:/Development/codebase-memory-mcp/DEPLOYMENT.zh-CN.md`）：
+
+| 工具 | 可选项（示例） |
+|---|---|
+| codebase-memory-mcp | 官方安装脚本(二进制/推荐) / 源码编译 / npm i -g / uv tool |
+| pi（@earendil-works/pi-coding-agent） | npm i -g（推荐）/ 官方安装器 / 源码 |
+| gh / GitHub CLI | winget / apt / 官网 MSI / 源码 go build |
+| rg / ripgrep | winget / apt / 官网二进制 |
+| uv | winget / 官方安装器（irm/curl） |
+| node | 官方 LTS / nvm-windows / 官网 tarball |
+| gh login 快速免密 | `gh auth login`（凭据存本机，免密做远端） |
+
+已装工具选项显示"已装✓"；未装按选择渲染到 `environment.md` 的**开发工具部署计划**节。**每项都可跳过**：跳过=不动该工具、不写部署命令。
+
+**Q5 部署/配置偏好（可跳过）**：部署风格（本地/远程跳板/容器）、测试哲学、代码风格、CI/CD、Monorepo/Polyrepo、风险偏好（"源码优先可控 / 二进制快速 / 包管理器整洁"）。未填一律**不替用户默认某一种**，注入只保留"默认偏好模板"占位。
+
+> 问卷产出统一作为 `──config questionnaire.json` 传给 render-now.py；**任何"可跳过"项 == 不注入该动态块**（铁律正文不受影响）。判断辅佐（可不问即推断，但推断结果要在报告说明）：用户说"这台机器/新机器/开箱即用"→全局；"这个项目/这个仓库/给 repo 加规则"或 cwd 即仓库→项目级；两者都要→先全局再项目级，分两次渲染。
 
 ### Phase 1: 宿主机环境探测
 
@@ -99,64 +132,48 @@ pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.
 2. 未部署 → 给出部署指引（官方仓库 `uv` 安装一条命令 + MCP 配置片段），**问用户是否现在装**；确认则执行并验证 `cli list_projects` 出 JSON
 3. 部署状态写入规则主文档触发表的 `{{CODEBASE_MCP_DOCS}}` 占位（填实际部署文档路径）
 
-### Phase 4: 交互式选择（一次问齐，不逐条打扰）
+### Phase 4: 注入规格（问卷 Q2 已定；此处保留分档事实表供 render-now 决策）
 
-1. **文档规范**：中文（默认）/ 双语标题（纯英文版为后续迭代）
-2. **注入规格（分档，量贩式）** —— **必须给用户选择**，默认给出「性能（全量，默认）」与「经济（分层）」两档对比与 token 利害；可选「超轻」与「自定义」。**默认档 = 性能（全量）**：
+| 档位 | 产物 | token 消耗（模型起始上下文） | 适用对象 |
+|---|---|---|---|
+| **性能（全量，默认）** | `PERFORMANCE` 段 → AGENTS.md + 各 agent 镜像全量正文（**铁律全文固写，不因问卷裁剪** + 环境/偏好画像驻留，~10KB/会话） | 高 | 不差钱、要铁律遵守密度与首次质量；**默认档** |
+| **经济（分层）** | `RULES` 段 → AGENTS.md + 镜像（行为规则 + 触发表，~2KB/会话）；环境/偏好/工具外置 `agent-reference/` 触发式读取 | 低 | 少数轻量任务，token 敏感 |
+| **超轻** | `RULES` 段 → 仅 AGENTS.md（极简行为规则 + 触发表），不生成 agent 镜像 | 极低 | 简单/短任务、token 极敏感 |
+| **自定义** | 用户勾选内联内容（铁律全文 / 环境 / 偏好 / 配色 / 网络…） | 按勾选 | 需要精确裁剪 |
 
-   | 档位 | 产物 | token 消耗（模型起始上下文） | 铁律遵守密度 / 首次上下文质量 | 适用对象 |
-   |---|---|---|---|---|
-   | **性能（全量，默认）** | `PERFORMANCE` 段 → AGENTS.md + CLAUDE.md 全量正文（动脑子铁律 + 环境 + 偏好画像驻留，~10KB/会话） | 高 | 最高 | 不差钱、更看重铁律遵守密度与首次上下文质量；**默认档** |
-   | **经济（分层）** | `RULES` 段 → AGENTS.md + 镜像（行为规则 + 触发表，~2KB/会话）；环境/偏好/工具外置 `agent-reference/` 触发式读取 | 低 | 中（参考不常驻） | 少数日常/轻量任务，token 敏感 |
-   | **超轻** | `RULES` 段 → 仅 AGENTS.md（极简行为规则 + 触发表），不生成 agent 镜像 | 极低 | 中 | 简单/短任务、token 极敏感 |
-   | **自定义** | 用户勾选要内联的内容（动脑子铁律全文 / 本机环境 / 开发偏好 / 领域偏好 / 配色 / 网络…） | 按勾选 | 按勾选 | 需要自定义裁剪的用户 |
+分档对照如实告知：性能档把「环境 + 偏好 + 铁律」写入起始上下文 → 模型无需先查参考即可遵守，token 成本高；经济/超轻档省 token，但环境/偏好需命中任务读参考，遵守密度受触发准确性影响。超轻档只有一份 AGENTS.md，跨平台行为不完全一致。
 
-   分档对照说明（如实告知利害）：
-   - 性能档把「环境 + 偏好画像 + 动脑子铁律」写入起始上下文 → 模型无需先查参考即可遵守，token 成本高；经济/超轻档省 token，但环境/偏好需命中任务时才读参考，遵守密度受触发准确性影响。
-   - 超轻档不生成 agent 镜像，只有一份 AGENTS.md，后续跨平台 agent 行为不完全一致。
-   - 自定义允许精确裁剪，但需要用户对自己的 token 预算与铁律遵守密度有明确偏好。
-3. **生成位置**：
-   - 全局（默认）：规则主文档 `AGENTS.md` + 按探测到的 agent 目录补镜像（`.claude/CLAUDE.md`、`.codex/AGENTS.md`、`.gemini/GEMINI.md`）；外置参考 `agent-reference/`；探测到 `.pi` 时部署 pi 强化层（`APPEND_SYSTEM.md` + `extensions/graph-first-gate.ts`）
-   - 项目专属：`./AGENTS.md` + `./CLAUDE.md` + `./GEMINI.md` + `./agent-reference/`（项目级不部署 pi 全局件）
-4. **偏好问卷（完整问卷，每次 init 必跑，不跳过）** —— 覆盖以下维度，产出 `agent-reference/preferences.md` 全量 + AGENTS.md/CLAUDE.md 摘要（{{PREFERENCES_SUMMARY}}）：
-   - **技术栈/语言**：主力语言、包管理器偏好（Node pnpm/npm/yarn/bun；Python uv/conda/poetry…）、构建/校验命令
-   - **领域路线图（多选）**：开发/全栈、前端、量化金融、科研、Data Science、生命科学、生信、可视化美术设计、其他自述领域
-   - **日常任务范围（自述）**：主要 agent 日常任务（开发/调试/文档/调研/上线运维…）
-   - **一般偏好**：部署风格、测试哲学、CI/CD、代码风格强制、Monorepo/Polyrepo、特殊约束
-   - 每次 init 都跑，产出写进 `agent-reference/preferences.md`（全量）并回填摘要到注入正文；若用户已有偏好文件，先读后以本次为准增量合并。
+> 分档只决定「铁律正文用量（PERFORMANCE vs RULES）与参考常驻与否」，**不裁剪任何铁律原文**。生成位置由问卷 Q1 决定：全局写 `$HOME` 四镜像 + pi 强化层；项目级写 `./AGENTS.md` + `./CLAUDE.md` + `./GEMINI.md` + `./agent-reference/`，不部署 pi 全局件。
 
-### Phase 5: 渲染分层注入体系
+### Phase 5: 渲染分层注入体系（问卷已定动态内容；铁律全文由模板固写）
 
-读取 `templates/host-injection.template.md`，先按段标记切分（四个段标记只以下方「=====」分隔注释行形式出现，按行首 `<!-- ===== [段名]` 匹配：RULES / ENVIRONMENT / TOOLING / APPEND），逐段渲染：
+读取 `templates/host-injection.template.md`，先按段标记切分（四个段标记只以下方「=====」分隔注释行形式出现，按行首 `<!-- ===== [段名]` 匹配：RULES / PERFORMANCE / ENVIRONMENT / TOOLING / APPEND），逐段渲染：
 
-| 占位符 | 渲染来源 | 探测不到时兜底 |
+| 占位符 | 渲染来源 | 可跳过（跳过时） |
 |---|---|---|
-| `{{LANG_HEADER}}` | 规范=中文 → `Always respond in Chinese-simplified`；双语 → 中英两行 | — |
-| `{{OS_NAME}}` | Phase 1 探测 os.name（Linux/Darwin/Windows_NT…） | `Unknown` |
-| `{{MIRROR_LIST}}` | 本机实际镜像清单（全局默认 `~/AGENTS.md + ~/.claude/CLAUDE.md`；探测到 `.codex`/`.gemini` 逐个追加） | `~/AGENTS.md`（单文档） |
-| `{{REFERENCE_DIR}}` | 全局 `$HOME/agent-reference`（Windows: `%USERPROFILE%\agent-reference`）；项目模式 `./agent-reference` | 同左默认 |
-| `{{DEV_ROOT}}` | 用户主开发根目录（问或从现有项目推断） | `~/Development` |
-| `{{CODEBASE_MCP_DOCS}}` | Phase 3 部署文档实际路径 | 仓库 README 链接 |
-| `{{CPU}}` `{{RAM}}` `{{GPU}}` `{{STORAGE}}` `{{HW_NOTES}}` | Phase 1 硬件探测 | 「未检测到」+ 手测命令提示 |
-| `{{PROXY_DESC}}` `{{PROXY_SOCKS5}}` `{{PROXY_HTTP}}` `{{PROXY_HTTP_HOSTPORT}}` | Phase 1 代理探测 | 「未检测到本地代理；如需请手填」 |
-| `{{ENV_TABLE}}` | conda env list / uv python list 渲染成 Markdown 表 | 「未检测到 conda/uv 环境」 |
-| `{{PREFERENCES_SUMMARY}}` | Phase 4 问卷摘要（技术栈/领域/日常任务/一般偏好） | 「未采集偏好，走默认偏好模板」 |
+| `{{LANG_HEADER}}` `{{OS_NAME}}` `{{MIRROR_LIST}}` `{{REFERENCE_DIR}}` `{{DEV_ROOT}}` `{{CODEBASE_MCP_DOCS}}` `{{CPU}}` `{{RAM}}` `{{GPU}}` `{{STORAGE}}` `{{HW_NOTES}}` `{{ENV_TABLE}}` | Phase 1 探测 + 作用域（全局/项目级） | —（探测驱动，无跳过） |
+| `{{ART_STYLE_SUMMARY}}` | **Q3 美术问卷**：风格预设 / 自填种子（auto_palette）/ 跳过 | 跳过/未选 → 不落死色，正文写"命中视觉任务按 visualization.md 现场确立" |
+| `{{PREFERENCES_SUMMARY}}` | Phase 4/0 偏好问卷摘要 | 可跳过 → 走默认偏好模板占位 |
+| `install_picks` 部署计划 | **Q4 工具部署偏好** → `environment.md`「开发工具部署计划」 | 整项跳过 → 不写任何部署命令 |
+| `visualization.md` | Q3 风格选择 / 自填种子生成 | 跳过 → 不生成 visualization.md |
+
+> **铁律完整性（用户重点）**：性能档的 `PERFORMANCE` 段（动脑子/说人话/齐头并进/开源脱敏/codebase 图谱/多 Agent/测试卫生/踩坑/网络拓扑）**全文固写在模板正文，1:1 复用历史全量注入，不因问卷任何"跳过"而裁剪**。模板升级改的就是铁律内容本身，不是问卷选项。渲染命令以 `render-now.py --config questionnaire.json` 为准（问卷落 `questionnaire.json`）。
 
 渲染与写入顺序：
 
-1. **[性能档] 无脑铁律模式**：写 `AGENTS.md`（PERFORMANCE 段全量正文），再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）+ 写 `agent-reference/preferences.md`（问卷全量）
-2. **RULES 段（经济/超轻档）** → 写通用 `AGENTS.md`，再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）
-3. **ENVIRONMENT 段** → 写 `agent-reference/environment.md`（目录不存在则创建）
-4. **TOOLING 段** → 写 `agent-reference/tooling.md`（图谱工具指南：CLI 速查/场景映射表/三层 fallback 状态机/反例/决策树，含 {{DEV_ROOT}} 与 {{CODEBASE_MCP_DOCS}} 渲染）；工具名一律按「功能」写参考名，并注明以当前实际部署 schema 为准
-4'. **[性能档] PERFORMANCE 段** → 全量正文（动脑子/齐头并进/说人话/Codebase 图谱完整用法/多 Agent 协作/测试卫生/踩坑/配色/网络拓扑/环境/偏好 **1:1 复用 .bak 全量注入，不省略任何铁律**；工具名按功能参考名）；经济/超轻档用 RULES 段精简（§1 判断 + §1.1 齐头并进 + §1.2 说人话 + §2 事实源 + §3-8 契约 + 触发表），环境/偏好/图谱/配色/网络按比例外置 `agent-reference/` 触发读取
-5. **APPEND 段** → 探测到 pi（`~/.pi` 或 `%USERPROFILE%\.pi`）时写 `.pi/agent/APPEND_SYSTEM.md`；同时把 `templates/graph-first-gate.ts` 复制到 `.pi/agent/extensions/`（已存在且 md5 不同时提示用户 diff 决定）；提示 `pi` 重启或 `/reload` 生效
-6. **全产物检查**：每个写出的文件不允许残留任何 `{{`；镜像间 cmp 一致（network/visualization 等其余参考不生成，触发表已自洽）
+1. **[性能档] 无脑铁律模式**：写 `AGENTS.md`（PERFORMANCE 段全量正文 + 问卷动态占位回填），再逐字复制到各 agent 镜像（CLAUDE.md / codex AGENTS.md / GEMINI.md，按 Phase 1 探测结果）+ 写 `agent-reference/preferences.md`（问卷全量 + 默认模板）
+2. **RULES 段（经济/超轻档）** → 写通用 `AGENTS.md`，再逐字复制到各 agent 镜像（同上）
+3. **ENVIRONMENT 段** → `agent-reference/environment.md`（探测画像 + Q4 部署计划）
+4. **TOOLING 段** → `agent-reference/tooling.md`（图谱工具指南：CLI 速查/场景映射表/三层 fallback 状态机/反例/决策树，含 `{{DEV_ROOT}}` 与 `{{CODEBASE_MCP_DOCS}}` 渲染）；工具名一律按「功能」写参考名，并注明以当前实际部署 schema 为准
+4'. **Q3 视觉** → 选中风格/自填种子时生成 `agent-reference/visualization.md`（泵基调 + 主/强调/背景/正文 + 语义渐变），并在注入正文回填 `{{ART_STYLE_SUMMARY}}`；跳过则不生成、正文写"未在问卷选择"
+5. **APPEND 段** → 探测到 pi（`~/.pi` 或 `%USERPROFILE%\.pi`）时写 `.pi/agent/APPEND_SYSTEM.md`；同时把 `templates/graph-first-gate.ts` 复制到 `.pi/agent/extensions/`（已存在且 md5 不同时提示用户 diff 决定）；提示 `pi` 重启或 `/reload` 生效（**项目级不部署**）
+6. **全产物检查**：每个写出的文件不允许残留任何 `{{`；镜像间 cmp 逐字一致（已确认 4 镜像 md5 相同）；network.md / type-map.md 等用户自建参考不生成、触发表自洽
 
 ### Phase 6: 写入 + 报告（含备份与分层增量）
 
 1. 目标文件已存在 → 备份为 `<原名>.hostinit-bak.<YYYYmmddHHMMSS>` 再写入
 2. 按三平台路径表写入（Linux/macOS/WSL 用 `$HOME/...`；Windows 原生用 `$env:USERPROFILE\...`；项目模式用 `./...`）
-3. 输出报告：环境画像摘要 / 缺口清单（已装✓ 未装⚠）/ 各层产物写入位置清单 / pi 强化层部署状态 / 下一步建议（跑 deploy 脚本装 skills、`/dev-env-scan` 建项目画像、`/ai-spec` 开始需求）
+3. 输出报告：环境画像摘要 / **问卷选择回显（作用域/规格/美术/部署/偏好，含跳过项）** / 缺口清单（已装✓ 未装⚠）/ 各层产物写入位置 / pi 强化层部署状态 / 下一步建议
 
 ## 分层增量更新规则（产物已存在时）
 

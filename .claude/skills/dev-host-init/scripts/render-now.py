@@ -6,26 +6,37 @@ render-now.py — 通用分层注入渲染器（dev-host-init 性能档）
 复用 fill-placeholders.py 的 build_values / fill_template / detect_sensitive，
 在本机运行 host-scan 实测 JSON，渲染整套分层注入产物。**支持两种作用域**：
 
-  全局（--scope global，默认）
+  全局（默认）
       AGENTS.md + .claude/CLAUDE.md + .codex/AGENTS.md + .gemini/GEMINI.md（4 镜像）
-      agent-reference/{environment,tooling,preferences}.md
+      agent-reference/{environment,tooling,preferences}.md   + 可选 visualization.md（问卷）
       .pi/agent/APPEND_SYSTEM.md + extensions/graph-first-gate.ts（探测到 .pi 才部署）
 
-  项目级（--scope project --project <目录>）
-      <项目>/AGENTS.md + ./CLAUDE.md + ./GEMINI.md（3 镜像，逐字一致）
-      <项目>/agent-reference/{environment,tooling,preferences}.md
+  项目级（--project <目录>）
+      <项目>/AGENTS.md + ./CLAUDE.md + ./GEMINI.md（3 镜像）
+      <项目>/agent-reference/{environment,tooling,preferences}.md（+ visualization.md）
       （项目级不部署 pi 全局件；MIRROR_LIST / REFERENCE_DIR 渲染为 ./ 相对路径）
+
+**问卷驱动（--config questionnaire.json，可跳过）**
+   配置字段（均可缺省；缺省=不注入该块，留用户空间，绝不默认套用他人偏好）：
+     {
+       "art_style":   "engineering-calm"           // 预设风格 id（tools-catalog.ART_STYLES）；或
+       "art_seed":    "自由文本（走配色生成逻辑）"  // 与 art_style 二选一；
+       "art_skip":    true                         // 跳过视觉注入（template 里 ART_STYLE_SUMMARY 给"未定"）
+       "install_picks": {"codebase-memory-mcp": "官方安装脚本（推荐）", ...}  // 部署计划渲染
+       "preferences_summary_extra": "...",         // 追加摘要（可选）
+     }
 
 设计约束（开源仓库脱敏铁律）：
   ★ 本文件不得包含任何本机专属字面量（用户路径 / IP / 域名 / 别名 / 端口）。
   ★ HOME 取自 os.path.expanduser；DEV_ROOT 取环境变量 DEV_HOST_DEV_ROOT
     （缺省 ~/Development），调用方在命令行传入真实值。
-  ★ SSH 跳板别名从 ~/.ssh/config 运行时解析，不写死。
-  ★ Windows 专属补充段仅在 os.name == 'nt' 时渲染；conda 环境名来自探测。
+  ★ SSH 跳板别名从 ~/.ssh/config 运行时解析；conda 环境名来自探测。
+  ★ 全部部署命令/风格预设集中在 tools-catalog.py（公开下载源 + 通用占位，可审计）。
 
 用法：
-  全局   DEV_HOST_DEV_ROOT=<开发根> python scripts/render-now.py
-  项目级 DEV_HOST_DEV_ROOT=<开发根> python scripts/render-now.py --project <项目绝对路径>
+  全局   DEV_HOST_DEV_ROOT=<开发根> python scripts/render-now.py [--config q.json]
+  项目级 DEV_HOST_DEV_ROOT=<开发根> python scripts/render-now.py --project <项目绝对路径> [--config q.json]
+  先 --dry-run 用 questionnaire 看将写路径，确认后再真写。
 """
 import argparse, importlib.util, json, os, re, subprocess, sys
 
@@ -39,9 +50,30 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--project", default=None,
                 help="项目级模式：渲染到该目录（AGENTS.md/CLAUDE.md/GEMINI.md/agent-reference/，3 镜像）；省略=全局模式(4 镜像 + pi 强化层)")
 ap.add_argument("--dry-run", action="store_true", help="只打印将写出的路径，不写盘（校验 --project 解析）")
+ap.add_argument("--config", default=None, help="问卷 JSON：art_style/art_seed/art_skip/install_picks/preferences_summary_extra")
 ARGS = ap.parse_args()
 SCOPE_GLOBAL = ARGS.project is None
 PROJECT_DIR = os.path.abspath(ARGS.project) if ARGS.project else None
+
+
+# ---------- 0. 加载 tools-catalog 与问卷 ----------
+def load_tools():
+    spec = importlib.util.spec_from_file_location("tools_catalog", os.path.join(SCRIPT_DIR, "tools-catalog.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+tc = load_tools()
+
+Q = {}
+if ARGS.config and os.path.exists(ARGS.config):
+    Q = json.load(open(ARGS.config, encoding="utf-8"))
+art_style_id = Q.get("art_style")
+art_seed = Q.get("art_seed", "").strip()
+art_skip = bool(Q.get("art_skip"))
+install_picks = Q.get("install_picks", {}) or {}
+prefs_extra = Q.get("preferences_summary_extra", "")
 
 
 # ---------- 1. 复用 fill-placeholders 渲染核心 ----------
@@ -143,6 +175,23 @@ values["HOME_DIR"] = HOME
 values["DEV_ROOT"] = DEV_ROOT
 values["CODEBASE_MCP_DOCS"] = os.path.join(DEV_ROOT, "codebase-memory-mcp", "DEPLOYMENT.zh-CN.md")
 
+# 问卷视觉选择：fill_template 切段前先落进 values（模板内 {{ART_STYLE_SUMMARY}} 将被正确替换）
+art_summary = "未在 init 问卷选择（命中视觉任务时按 visualization.md 现场确立，不替他域套用）"
+if art_style_id:
+    s = tc.style_by_id(art_style_id)
+    if s:
+        values["ART_STYLE_SUMMARY"] = (f"风格 {s['name']}：主 {s['palette']['primary']} / 强调 {s['palette']['accent']} / "
+                                       f"背景 {s['palette']['bg']} / 正文 {s['palette']['text']}；语义渐变 {s['gradient'][0]}→{s['gradient'][1]}")
+        art_summary = f"{s['name']}（{s['palette']['primary']}/{s['palette']['accent']}）"
+elif art_seed:
+    _auto = tc.auto_palette(art_seed)
+    _m = re.search(r"主基调：(\S+) / 强调：(\S+)", _auto)
+    if _m:
+        values["ART_STYLE_SUMMARY"] = f"按自由文本生成的基调：主 {_m.group(1)} / 强调 {_m.group(2)}（见 visualization.md）"
+        art_summary = f"自定义基调（主 {_m.group(1)} / 强调 {_m.group(2)}）"
+if "ART_STYLE_SUMMARY" not in values and not art_skip:
+    values["ART_STYLE_SUMMARY"] = art_summary
+
 if SCOPE_GLOBAL:
     values["MIRROR_LIST"] = "~/AGENTS.md、~/.claude/CLAUDE.md、~/.codex/AGENTS.md、~/.gemini/GEMINI.md"
     values["REFERENCE_DIR"] = os.path.join(HOME, "agent-reference")
@@ -153,6 +202,7 @@ else:
 
 values["ENV_TABLE"] = ("conda: " + ", ".join(conda_envs or ["未检测到"])
                        + ("\nuv python: " + ", ".join(uv_pythons[:8]) if uv_pythons else ""))
+
 if aliases:
     values["PREFERENCES_SUMMARY"] = (
         "主力语言：Python + Node.js/TypeScript + R（生信出图）；Bash/批处理辅助。\n"
@@ -161,7 +211,8 @@ if aliases:
         "日常任务：开发/调试/文档/调研/上线运维、生信分析（Seurat/Bioc/R 出图）。\n"
         f"远程跳板别名（~/.ssh/config 解析）：{', '.join(aliases[:6])}" if aliases else ""
         f"。\n路径约定：开发 {DEV_ROOT}、学术 ~/R、MCP server 开发 {DEV_ROOT} 或 ~/mcp。\n"
-        "完整问卷见 agent-reference/preferences.md，此处为常驻摘要。")
+        + (f"问卷补充：{prefs_extra}\n" if prefs_extra else "")
+        + "完整问卷见 agent-reference/preferences.md，此处为常驻摘要。")
 else:
     values["PREFERENCES_SUMMARY"] = (
         "主力语言：Python + Node.js/TypeScript + R（生信出图）；Bash/批处理辅助。\n"
@@ -169,7 +220,8 @@ else:
         "领域路线图：开发/全栈、量化金融、科研、Data Science、生命科学/生信、可视化美术设计。\n"
         "日常任务：开发/调试/文档/调研/上线运维、生信分析（Seurat/Bioc/R 出图）。\n"
         f"路径约定：开发 {DEV_ROOT}、学术 ~/R、MCP server 开发 {DEV_ROOT} 或 ~/mcp。\n"
-        "完整问卷见 agent-reference/preferences.md，此处为常驻摘要。")
+        + (f"问卷补充：{prefs_extra}\n" if prefs_extra else "")
+        + "完整问卷见 agent-reference/preferences.md，此处为常驻摘要。")
 
 tpl_text = open(TEMPLATE, encoding="utf-8").read()
 full = fp.fill_template(tpl_text, values)
@@ -249,6 +301,12 @@ elif not SCOPE_GLOBAL:
         "~/.agents/skills/codebase-memory/SKILL.md",
         "<本机 codebase-memory skill 路径>（global 模式渲染时回填）", 1)
 
+# 6e. 视觉基调摘要回填（AFTER PERFORMANCE 切段后，模板里 ART_STYLE_SUMMARY 位于 PERFORMANCE 段）
+if "ART_STYLE_SUMMARY" in values:
+    performance = performance.replace("{{ART_STYLE_SUMMARY}}", values["ART_STYLE_SUMMARY"])
+else:
+    performance = performance.replace("{{ART_STYLE_SUMMARY}}", art_summary)
+
 # ---------- 7. 组装并写出（含备份；graph-first-gate 按 DEV_ROOT 生成）----------
 def w(path, text, backup=False):
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -303,6 +361,7 @@ prefs = """# 开发偏好问卷（agent-reference/preferences.md 全量）
 
 > 由 dev-host-init（性能档 init）聚合生成：技术栈/包管理器/路径约定来自本次扫描与全局规则权威源；
 > 远程跳板别名来自 ~/.ssh/config 运行时解析。每次 init 重跑，用户当次选择为准增量合并。
+> 本文为「问卷快照 + 通用默认」；任何未在问卷明确选择的内容都不替用户下结论（缺失则触发式补采）。
 
 ## 技术栈/语言（偏好顺序）
 
@@ -322,7 +381,7 @@ prefs = """# 开发偏好问卷（agent-reference/preferences.md 全量）
 
 ## 路径约定
 
-- 开发项目：DEV_HOST_DEV_ROOT 指向的开发根；学术项目：~/R
+- 开发项目：开发根；学术项目：~/R
 - MCP server 开发：开发根 或 ~/mcp/
 
 ## Conda 环境速查（init 探测）
@@ -339,19 +398,35 @@ CONDA_ENVS_LINE
 
 ## 一般偏好
 
-- **部署风格**：本地 + 远程跳板（别名见 environment.md）；不许重开已关闭的 Web 映射
+- **部署风格**：本地 + 远程跳板（别名见 environment.md）；不允许重开已关闭的 Web 映射
 - **测试哲学**：定向回归优先；关键路径（交易/权限/状态机）验入口到实际结果；恒有负控
 - **代码风格**：补丁式小 diff，可审查
 - **Windows 中文编码**：见 environment.md「Windows 编码规则」
 
-## 领域偏好
+## 领域偏好（问卷未涉及则不套用）
 
-- R 生信出图一步到位：Acu(针灸)温煦暖粉 / Dys(痢疾)病理冷紫 双系配色，完整色值见 agent-reference/visualization.md 触发表
-- 新项目 Python 用 uv；已有 conda 环境直接复用，不重复造轮子
+- 若在 init 问卷选择了视觉/配色：其风格基调见 preferences.md 同目录 visualization.md；未选则按 visualization.md 现场确立
+- 新项目 Python 用 uv；已有 conda 环境直接复用
 - 未经明确指示不 git commit/push；开源仓库 push 前强制脱敏核查
 """
 prefs = prefs.replace("CONDA_ENVS_LINE", (", ".join(conda_envs) if conda_envs else "未检测到"))
 prefs = prefs.replace("开发根", DEV_ROOT).rstrip() + "\n"
+
+# 部署计划按问卷写入 environment.md；视觉种子按问卷写入 visualization.md
+install_todo = tc.render_install_todo(install_picks)
+if install_todo:
+    environment_out = environment_out.rstrip() + "\n\n" + install_todo + "\n"
+
+visualization_out = None
+if not art_skip:
+    if art_style_id:
+        style = tc.style_by_id(art_style_id)
+        if style:
+            visualization_out = (f"# 视觉/图表风格（agent-reference/visualization.md）\n\n"
+                                 + tc.palette_text(style))
+    elif art_seed:
+        visualization_out = ("# 视觉/图表风格（agent-reference/visualization.md）\n\n"
+                             + tc.auto_palette(art_seed))
 
 # graph-first-gate.ts：PROJECT_ROOTS 指向本机 DEV_ROOT（Windows 拆盘符，POSIX 用整路径）
 if os.name == "nt":
@@ -369,6 +444,8 @@ def target_paths():
     ref = os.path.join(PROJECT_DIR, "agent-reference") if PROJECT_DIR else os.path.join(HOME, "agent-reference")
     paths = [p for _, p in masters]
     paths += [os.path.join(ref, n) for n in ("environment.md", "tooling.md", "preferences.md")]
+    if visualization_out and not art_skip:
+        paths.append(os.path.join(ref, "visualization.md"))
     if SCOPE_GLOBAL:
         paths += [os.path.join(HOME, ".pi", "agent", "APPEND_SYSTEM.md"),
                   os.path.join(HOME, ".pi", "agent", "extensions", "graph-first-gate.ts"),
@@ -388,6 +465,8 @@ ref_dir = os.path.join(PROJECT_DIR, "agent-reference") if PROJECT_DIR else os.pa
 w(os.path.join(ref_dir, "environment.md"), environment_out, backup=True)
 w(os.path.join(ref_dir, "tooling.md"), tooling, backup=True)
 w(os.path.join(ref_dir, "preferences.md"), prefs, backup=True)
+if visualization_out and not art_skip:
+    w(os.path.join(ref_dir, "visualization.md"), visualization_out, backup=True)
 
 if SCOPE_GLOBAL:
     w(os.path.join(HOME, ".pi", "agent", "APPEND_SYSTEM.md"), append_body, backup=True)
