@@ -74,11 +74,44 @@ if (Test-Cmd uv) {
 
 # ---------- proxy ----------
 $proxyPorts = @()
-foreach ($p in 1080, 7890, 7897, 8118, 10808, 10940) {
+foreach ($p in 1080, 7890, 7897, 8118, 10808, 8888) {
     $client = New-Object System.Net.Sockets.TcpClient
     try {
         $task = $client.ConnectAsync('127.0.0.1', $p)
         if ($task.Wait(500) -and $client.Connected) { $proxyPorts += "$p" }
+    } catch { } finally { $client.Dispose() }
+}
+
+# ---------- network topology (init 时探测) ----------
+$net = [ordered]@{
+    vps_alias = $null; vps_ip = $null; frp_svc = $null
+    nginx_server_name = $null; nginx_port = $null
+    listen_ports = @()
+}
+# SSH config (OpenSSH): 解析 Host / HostName
+$sshCfg = Join-Path $env:USERPROFILE '.ssh\config'
+if (Test-Path $sshCfg) {
+    $lines = Get-Content $sshCfg -ErrorAction SilentlyContinue
+    $inBlock = $false
+    foreach ($line in $lines) {
+        if ($line -match '^\s*Host\s+') {
+            if (-not $inBlock -and -not $net.vps_alias) {
+                $net.vps_alias = ($line -replace '^\s*Host\s+', '').Trim() -split '\s+' | Select-Object -First 1
+                $inBlock = $true
+            } elseif ($inBlock) { break }
+        } elseif ($inBlock -and $line -match '^\s*HostName\s+(.+)$') {
+            $net.vps_ip = $Matches[1].Trim(); break
+        }
+    }
+}
+# frp service / nginx: Windows 无 systemctl & 通常无 nginx，留 null
+# 端口扫描 (回环 listen)
+$scanPorts = 22, 80, 443, 1080, 7890, 8787, 8765, 8767, 8090, 8000, 8080, 8443, 22022, 2222
+foreach ($p in $scanPorts) {
+    $client = New-Object System.Net.Sockets.TcpClient
+    try {
+        $task = $client.ConnectAsync('127.0.0.1', $p)
+        if ($task.Wait(300) -and $client.Connected) { $net.listen_ports += "$p" }
     } catch { } finally { $client.Dispose() }
 }
 
@@ -113,6 +146,7 @@ $out = [ordered]@{
         env_https = $env:HTTPS_PROXY
         open_local_ports = $proxyPorts
     }
+    network = $net
     codebase_mcp = [ordered]@{ cli_available = $cbCli; mcp_configured = $cbCfg }
     tools = [ordered]@{
         git = (Get-Ver git '--version' 'git version ([\w.]+)')

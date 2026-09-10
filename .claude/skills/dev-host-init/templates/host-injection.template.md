@@ -67,6 +67,25 @@
 > - ✅ 用户问你"错在哪/怎么办"，用最直白话答；能用一句话说清就不用两段。
 > - ✅ 复杂逻辑用 举例 + 类比，而不是术语堆叠。
 
+## 1.3 开源仓库脱敏铁律（公共/开源仓库 push 前必查）
+
+> 凡是要 commit/push 到**公开或开源仓库**的文本（代码、文档、模板、注释、README、skill 文件），必须先把下面任一敏感类别替换为 `占位符` 或删除，**确认 0 命中后**才能 push。核查输出要明确告诉用户"哪个文件/哪一项有问题"。
+
+| 敏感类别 | 必查示例 |
+|---|---|
+| 公网 / 内网 IP | VPS 公网 IP、云主机 IP、SSH 回退 IP |
+| 域名 | 生产域名、备用域名、子域名 |
+| 端口 | 公网映射端口、SSH 端口、服务端口（如 8000/9443 这类高位端口） |
+| 用户 / 路径 | `/home/<user>`、`C:\Users\<user>`、仓库本地绝对路径、`<user>@<ip>` |
+| 凭据 | API Key / Secret / Token / 私钥（`-----BEGIN ... PRIVATE KEY-----`）/ 口令 |
+| 云与隧道资源 | 桶名、资源 ID、集群名、FRP/tunnel 服务名（如 `frpc@<host>`、ssh alias） |
+
+**处置顺序**：
+1. 真实值一律改为 `占位符`；模板只允许占位符，渲染端由 init 实际探测回填（见 `dev-host-init/scripts/fill-placeholders.py`）。
+2. push 前自查：`git log --all -S'<敏感串>' --oneline` 扫历史；工具用 `fill-placeholders.py`（内置敏感黑名单）。
+3. 一旦**历史**泄漏过真实值，必须 `git-filter-repo` 全史清除后 force-push，只改最新 commit 不够。
+4. 不确定是否敏感 => 按敏感处理，先占位符化/删除。
+
 ## 2. 事实源与代码发现
 
 - 进入项目先读适用的项目规则；代码结构探索先查 codebase-memory 索引，未索引优先建 full 索引。
@@ -188,6 +207,25 @@
 - 修改涉及 N 端时，交付物必须体现 N 端齐头并进（或对未动端给出明确、可接受的豁免理由）；只改一端就把 CHG 标"完成"= 违规。
 - commit/push 前核对改动覆盖面：受影响各端改动是否被遗漏；回归测试覆盖受影响各端（而不仅是改的端）。
 - 所有流程性铁律（codebase 索引优先、多 agent 协作、测试卫生、commit 规范）皆是手段，**齐头并进与动脑子综合判断才是目的**；不得为走流程而牺牲覆盖面。
+
+## 开源仓库脱敏铁律（公共/开源仓库 push 前必查）
+
+> 凡是要 commit/push 到**公开或开源仓库**的文本（代码、文档、模板、注释、README、skill 文件），必须先把下面任一敏感类别替换为 `占位符` 或删除，**确认 0 命中后**才能 push。核查输出要明确告诉用户"哪个文件/哪一项有问题"。
+
+| 敏感类别 | 必查示例 |
+|---|---|
+| 公网 / 内网 IP | VPS 公网 IP、云主机 IP、SSH 回退 IP |
+| 域名 | 生产域名、备用域名、子域名 |
+| 端口 | 公网映射端口、SSH 端口、服务端口（如 8000/9443 这类高位端口） |
+| 用户 / 路径 | `/home/<user>`、`C:\Users\<user>`、仓库本地绝对路径、`<user>@<ip>` |
+| 凭据 | API Key / Secret / Token / 私钥（`-----BEGIN ... PRIVATE KEY-----`）/ 口令 |
+| 云与隧道资源 | 桶名、资源 ID、集群名、FRP/tunnel 服务名（如 `frpc@<host>`、ssh alias） |
+
+**处置顺序**：
+1. 真实值一律改为 `占位符`；模板只允许占位符，渲染端由 init 实际探测回填（见 `dev-host-init/scripts/fill-placeholders.py`）。
+2. push 前自查：`git log --all -S'<敏感串>' --oneline` 扫历史；工具用 `fill-placeholders.py`（内置敏感黑名单）。
+3. 一旦**历史**泄漏过真实值，必须 `git-filter-repo` 全史清除后 force-push，只改最新 commit 不够。
+4. 不确定是否敏感 => 按敏感处理，先占位符化/删除。
 
 ## Codebase 索引优先（codebase-memory-mcp）
 
@@ -405,7 +443,7 @@ commit 和 push 是需确认的动作（非自动）。但主人明示「该推�
 ## 踩坑记录（避免重复犯错）
 
 - **rm -i 别名**：主人 shell 把 `rm` 别名成 `rm -i`（每次删文件都问确认）。批量删除用 `/bin/rm -f` 或 `command rm -f`
-- **Bash 工作目录**：Bash 工具默认 cwd 是 `/home/shpc_101170`（不是项目目录）。用相对路径会解析错误，**一律用绝对路径**
+- **Bash 工作目录**：Bash 工具默认 cwd 是 `{{HOME_DIR}}`（不是项目目录）。用相对路径会解析错误，**一律用绝对路径**
 - **管道掩盖退出码**：`cmd | tail` 会用 tail 的 exit code 覆盖 cmd 的。验证命令成败用 `cmd > /tmp/out.log 2>&1; echo "EXIT=$?"; tail -20 /tmp/out.log`
 - **vendor 源码不完整**：从 GitHub 下载的 vendor 目录可能缺文件（如 Cython .pyx）。编译失败时改用 PyPI 包
 - **setuptools-scm 无 .git**：vendor 源码无 .git 目录时 setuptools-scm 推断版本失败。设 `SETUPTOOLS_SCM_PRETEND_VERSION=x.y.z` 环境变量
@@ -508,58 +546,49 @@ scale_fill_gradientn(colors = HM_DIV)
 
 ---
 
-## 网络拓扑与公网访问规则（西柚云 2026-08-17 端口整改后）
+## 网络拓扑与公网访问规则（动态探测）
 
-> 📌 **权威文档**：`/home/shpc_101170/!运维文档/服务器统一安全公网访问方案_2026-08-17.md`（总拓扑/双VPS框架/兜底链，v2.1）；KAIROS 端点细节以 `/home/shpc_101170/Development/kairos-trader/docs/CLOUDFLARE_SECURE_ACCESS.md` 为准。域名、证书、公网入口、FRP 任何变更必须同步这两份文档。
+> 本段由 `/ai-spec init` 或 `/dev-host-init` 在 init 时**实际探测**后自动回填（IP/域名/端口/SSH隧道/运维路径均来自本机真实状态），非硬编码。公开模板**不包含任何真实 IP/域名/路径**。
+> 你在新机器上跑 init 时，这段会用那台机器自身的网络拓扑生成，从而实现「任何机器一键扫端口 → 搞清拓扑 → 快速部署」。
 
-### 当前拓扑（2026-08-17 起生效）
-
-西柚云公网端口映射被运营商整改关闭（**终局仅剩 SSH**），公网访问一律走「中转 VPS + FRP 反向隧道」；人工访问走 SSH 隧道（FutureTerminal 为基本盘）：
+### 当前拓扑（探测结果）
 
 ```
-外部 Agent / 浏览器
-   → https://kairos.hxalex.com:10942     (DNS→美国VPS 38.60.91.69, 灰云直连)
-   → frps :7000 隧道  ←  frpc@us (本机 systemd 主动出站, 断线自动重连)
-   → 本机 nginx :10942 (TLS 终止, 证书 Cloudflare DNS-01 自动续期)
-        ├─ /kairos-trader/dashboard     → :8090
-        ├─ /kairos-trader/mcp/          → :8765
-        └─ /kairos-trader/mcp-external/ → :8767
+外部入口
+   → {{NET_PUB_URL}}                       (DNS→中转 VPS {{NET_VPS_IP_PUB}}, 动态探测)
+   → frps :{{NET_FRP_BIND_PORT}} 隧道  ←  {{NET_FRP_SVC}} (本机 systemd 主动出站)
+   → 本机 nginx :{{NET_PUB_PORT}} (TLS 终止)
+        ├─ /{{NET_APP_SLUG}}/dashboard     → :{{NET_PORT_DASHBOARD}}
+        ├─ /{{NET_APP_SLUG}}/mcp/          → :{{NET_PORT_MCP}}
+        └─ /{{NET_APP_SLUG}}/mcp-external/ → :{{NET_PORT_MCP_EXT}}
 
-人工 (主人): FutureTerminal / ssh -p 10936 → 隧道 127.0.0.1:10943 (codeserver) / :8787 (RStudio)
-内部: docker 内网 mcp-gateway:8765 (openclaw 等零改动, 不受公网影响)
+人工 (主人): {{NET_SSH_METHOD}} → 隧道 {{NET_PORT_TUNNEL_CODESERVER}} (codeserver) / :{{NET_PORT_RSTUDIO}} (RStudio)
+内部: docker 内网 mcp-gateway:{{NET_PORT_MCP}} (内部零改动)
 ```
 
 ### 关键事实（Agent 必记）
 
 | 项 | 值 |
 |---|---|
-| 西柚云公网 | **仅剩 `10936→22` (SSH)**；8787 预计 2026-09 关、8888 预计 2026-10 关，其余映射已全部关闭且**不可重开** |
-| KAIROS 公网入口 | `https://kairos.hxalex.com:10942`（域名/端口/证书/Agent 配置全部不变，DNS 已指向中转 VPS） |
-| 中转 VPS | 美国 `38.60.91.69`（`ssh vps-us` 免密直连，接管旧 frps 0.54.0，token 在 `~/Development/kairos-frp/secrets/`）；国内 VPS 待购，到位后 `setup.sh install` 通道名填 `cn` 即双活 |
-| FRP 运维 | `~/Development/kairos-frp/setup.sh status`（健康一览）/ `install`（新通道）/ `dns <域名> <IP>`（自动切 CF 记录）；日志 `journalctl -u frpc@us -f` |
-| 出口代理 | `127.0.0.1:10940` (HTTP) / `:1080` (SOCKS5) 是本机 xray 代理，与 FRP 隧道无关，nginx 永不监听 |
+| 公网入口 | `{{NET_PUB_URL}}`（域名/端口/证书/Agent 配置，init 时探测） |
+| 中转 VPS | `{{NET_VPS_IP_PUB}}`（`ssh {{NET_VPS_SSH_ALIAS}}` 免密直连，init 时从 SSH config 解析） |
+| FRP 运维 | `{{NET_FRP_DIR}}/setup.sh status` / `install` / `dns <域名> <IP>`；日志 `journalctl -u {{NET_FRP_SVC}} -f` |
+| 出口代理 | `{{NET_PROXY_HTTP}}` (HTTP) / `{{NET_PROXY_SOCKS5}}` (SOCKS5) 本机代理，与 FRP 隧道无关 |
+| Nginx 配置 | `{{NET_NGINX_CONF}}`（部署到 `/etc/nginx/sites-available/` → `nginx -t` → reload） |
 
 ### 铁律
 
-1. ❌ **禁止**再建议「西柚云控制台开启 10942/10941 等公网映射」——运营商整改已封，不可恢复；排查公网问题先 `setup.sh status` 查 FRP 链路
-2. ✅ 新服务公网暴露的唯一姿势：本机内网监听 → nginx `:10942` 加 `/应用名/` 路径（经既有 FRP 隧道自动获得公网）；或纯 SSH 隧道（人工用）
-3. ✅ nginx 职责仅剩一个：`:10942` TLS 分流；`:8888` 统一入口已作废（待清理）；`:80/:10941` 仅本机回环调试
-4. ✅ TLS 端到端透传：证书与续期都在本机，中转 VPS 只见密文；改 DNS 一律用 `setup.sh dns`（保持灰云、TTL300）
-5. 🔸 应急兜底（FRP 全挂）：`ssh -p 10936 -L 10942:127.0.0.1:10942 shpc_101170@221.213.116.73` 后本地 `https://127.0.0.1:10942/...` 直验
+1. ❌ 不硬编码公网/内网 IP、域名、端口在代码或文档 —— 一律走 init 探测回填的占位符
+2. ✅ 新服务公网暴露唯一姿势：本机内网监听 → nginx `:{{NET_PUB_PORT}}` 加 `/应用名/` 路径（经既有 FRP 隧道自动获得公网）；或纯 SSH 隧道（人工用）
+3. ✅ TLS 端到端透传：证书与续期在回源机，中转 VPS 只见密文；改 DNS 用 `setup.sh dns`
+4. 🔸 应急兜底（FRP 全挂）：`ssh -p {{NET_SSH_LOCAL_PORT}} -L {{NET_PUB_PORT}}:127.0.0.1:{{NET_PUB_PORT}} {{NET_SSH_USER}}@{{NET_VPS_IP_PUB}}` 后本地 `https://127.0.0.1:{{NET_PUB_PORT}}/...` 直验
 
-### Nginx 配置文件位置与部署（不变）
+### 运维文档（init 时探测本机实际位置）
 
-- 仓库副本：`/home/shpc_101170/Development/kairos-trader/config/nginx.conf`
-- 部署：`sudo cp` 到 `/etc/nginx/sites-available/kairos` → 软链到 sites-enabled → `sudo nginx -t` → `sudo systemctl reload nginx`
+- 入口文档 / 权威运维方案：`{{NET_INGRESS_FILE}}`
+- 应用文档 / 端点细节：`{{NET_KAIROS_DOCS}}`
 
-### 西柚云域名（仅 SSH/备用）
-
-| 区域 | 备用域名 |
-|------|---------|
-| 西南一区 | ctcc1.xiyoucloud.pro / ctcc2 / ctcc3 |
-| 西南二区 | sw2-backup1.xiyoucloud.pro / sw2-backup2 |
-
-> `sw1-dynamic.xiyoucloud.pro` 需跟随实例公网 IP；它只服务 SSH 入口，**任何 Web/服务不得再依赖 xiyoucloud 域名或其公网端口**。
+> `{{NET_PUB_DOMAIN}}` 仅用于 SSH/备用，不做 Web 入口依赖。
 
 <!-- ===================== [ENVIRONMENT] 外置参考：agent-reference/environment.md ===================== -->
 
@@ -656,7 +685,7 @@ echo '{"project":"项目名","query":"MATCH (f:Function) RETURN f.name LIMIT 5"}
 | 只记得功能不记得名字 | 先用 `search_graph(name_pattern)`，必要时 `semantic_query` | 语义搜索兑底 |
 | 看某个函数/类的具体代码 | `get_code_snippet(qualified_name)` | 仅拿该 symbol 的几行，不加载整个文件 |
 | 改了代码，影响范围？ | `detect_changes()` | git diff → 风险映射 |
-| 检查文件/路径有没有被索引 | `check_index_coverage(path)` | 先查后读，避免读未索引文件 |
+| 检查文件/路径有没有被索引 | `index_status` / `search_code(files)` | 先查后读，避免读未索引文件 |
 | 获取索引统计（节点、边、标签） | `get_graph_schema(project)` | 了解项目规模 |
 
 ## 强制执行顺序（三层 fallback 状态机）
@@ -673,7 +702,7 @@ Layer 2 — 索引保障（未索引 / embedding 过期时）
    完成后回到 Layer 1 —— 不允许索引完直接读文件
 
 Layer 3 — 直读兑底（final fallback）
-   先 check_index_coverage(path) 确认已索引
+   先 index_status / 图谱查询确认已索引
    然后 read(path) 读具体文件/行号
 ```
 
@@ -703,7 +732,7 @@ Layer 3 — 直读兑底（final fallback）
 3. **`query_graph`**：是最灵活的底层查询工具，任何图谱层面找关系的问题都可以用它
 4. **不确定 symbol 名称**：先用 `search_graph(name_pattern=".*")` 搜到准确名字
 5. **同时涉及多个文件的改动**：用 `detect_changes()` 定位影响范围，再针对重点 symbol 用 `trace_path`
-6. **未索引的文件**：如果 `check_index_coverage` 说未索引，需要先索引项目，不要直接读取大段源码
+6. **未索引的文件**：如果 `index_status` / `search_code(files)` 说未索引，需要先索引项目，不要直接读取大段源码
 
 ## 快速决策树
 

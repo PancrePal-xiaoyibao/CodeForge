@@ -35,7 +35,24 @@ description: 宿主机一键初始化 — 新机器（Linux/macOS/Windows）环�
 3. **不留裸占位**：探测不到的 `{{占位符}}` 必须填明确兜底文案（如「未检测到，如需请手填」）
 4. **不覆盖**：目标产物已存在时先备份 `*.hostinit-bak.<时间戳>` 再写入；增量模式按「分层增量」规则处理（见 Phase 6）
 
-## 工作流（6 Phase）
+## 工作流（6 Phase + Phase 0 首问）
+
+### Phase 0: 作用域首问（强制，先于一切探测与渲染）
+
+**任何一次 init（含 `/ai-spec init`）开始后，第一件事就是问清作用域，不探测、不渲染、不写入。** 这是硬门：作用域决定"写哪儿、写几份镜像、是否部署 pi 强化层"，问错等于全盘重做（还可能污染用户仓库）。
+
+一次问齐（用 AskUserQuestion，不逐条打扰）：
+
+1. **作用域**：全局（本机所有项目共享，写入 `$HOME`/`%USERPROFILE%`）还是**项目级**（只写这个仓库，可入库）？
+2. **项目路径**：若选项目级 —— **目标目录是不是当前工作目录（cwd）？** 不是的话，请用户给出绝对路径。问完执行 `--dry-run` 把"将写入的绝对路径清单"回显给用户确认，**确认后才真写**。
+3. **项目级附加确认**：仓库若受 git 管理，说明产物会进入 `git status`（AGENTS.md / CLAUDE.md / GEMINI.md / agent-reference/ 四类），是否要顺手加进 `.gitignore` 或直接入库；项目级**不部署** pi 强化层（APPEND_SYSTEM / graph-first-gate 是 `~/.pi` 全局件）。
+
+判断辅佐（可不问即推断，但推断结果要在报告里说明）：
+- 用户说"这台机器/新机器/开箱即用" → 全局
+- 用户说"这个项目/这个仓库/给这个 repo 加规则"或当前 cwd 就是一个仓库 → 项目级
+- 两者都想要 → 先全局（机器基线），再项目级（项目补充），分两次渲染
+
+`dev-host-init` 自身在**项目级模式下从项目内运行**（如 `.claude/skills/dev-host-init/`），因此"路径在 cwd 下"是最常见的默认答案，但**必须问，不许默认**。
 
 ### Phase 1: 宿主机环境探测
 
@@ -43,6 +60,8 @@ description: 宿主机一键初始化 — 新机器（Linux/macOS/Windows）环�
 
 - Linux / macOS（含 WSL/Git Bash）：`bash <skill目录>/scripts/host-scan.sh`
 - Windows 原生：`powershell -NoProfile -File <skill目录>/scripts/host-scan.ps1`
+
+> ⚠️ Windows 原生（含 Git Bash）**优先用 `host-scan.ps1`**：Git Bash 里没有系统 `lscpu`/`free`/`nproc`，`.sh` 会输出空 JSON 导致硬件/代理全落空。`fill-placeholders.py` 已按 `os.name` 分派（Win→ps1，POSIX→sh），新脚本请沿用同一分派逻辑。
 
 脚本无法覆盖的平台差异项，用等价命令手动补测。探测维度：
 
@@ -52,7 +71,7 @@ OS & Shell     → 名称/版本/架构/默认 shell（os.name 决定三平台�
 语言运行时     → node / python / rust / go / java / dotnet / R（版本）
 包管理器       → npm / pnpm / yarn / uv / conda / cargo / pip / brew
 环境管理       → conda env list / uv python list（环境名清单）
-网络代理       → env 代理变量 + 常见本地端口试探(1080/7890/7897/8118/10940…)
+网络代理       → env 代理变量 + 常见本地端口试探(1080/7890/7897/8118/8888…)
 codebase-mcp   → codebase-memory-mcp cli 可用性 + MCP 配置登记状态
 pi / agent 目录→ ~/.pi（或 %USERPROFILE%\.pi）存在性、~/.claude、~/.codex、~/.gemini、~/.agents 存在性（决定镜像与强化层部署面）
 其他           → git 版本 / gh / docker / rg

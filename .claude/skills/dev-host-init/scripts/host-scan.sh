@@ -136,7 +136,7 @@ echo -n '    "env_http": ';  json_opt_str "${http_proxy:-${HTTP_PROXY:-}}";  ech
 echo -n '    "env_https": '; json_opt_str "${https_proxy:-${HTTPS_PROXY:-}}"; echo ','
 echo -n '    "open_local_ports": ['
 FIRST=1
-for port in 1080 7890 7897 8118 10808 10940; do
+for port in 1080 7890 7897 8118 10808 8888; do
   if timeout 1 bash -c "echo > /dev/tcp/127.0.0.1/$port" 2>/dev/null; then
     [[ $FIRST -eq 1 ]] || printf ', '
     FIRST=0; printf '"%s"' "$port"
@@ -144,6 +144,40 @@ for port in 1080 7890 7897 8118 10808 10940; do
 done
 echo ']'
 echo '  },'
+  # ---------- network topology (init 时探测) ----------
+  echo '  "network": {'
+  # SSH alias -> VPS IP (解析 ~/.ssh/config)
+  vps_ip=""; vps_alias=""
+  if [ -f "$HOME/.ssh/config" ]; then
+    vps_alias=$(awk '/^Host /{a=$2} a!="" && /HostName /{print a; exit}' "$HOME/.ssh/config" 2>/dev/null)
+    vps_ip=$(awk '/^Host /{a=$2} a!="" && /HostName /{print $2; exit}' "$HOME/.ssh/config" 2>/dev/null)
+  fi
+  echo -n '    "vps_alias": '; json_opt_str "${vps_alias}"; echo ','
+  echo -n '    "vps_ip": '; json_opt_str "${vps_ip}"; echo ','
+  # FRP systemd service
+  frp_svc=$(systemctl list-units --type=service --all 2>/dev/null | awk '/frpc|frp/{print $1; exit}' | head -1 || true)
+  echo -n '    "frp_svc": '; json_opt_str "${frp_svc}"; echo ','
+  # nginx server_name / port (本机已装时)
+  ngx_name=""; ngx_port=""
+  if [ -d /etc/nginx ]; then
+    ngx_name=$(grep -rhoE 'server_name[[:space:]]+[^;]+' /etc/nginx/sites-available /etc/nginx/conf.d 2>/dev/null \
+      | awk '$2 != "_" && $2 != "example.com" && $2 != "default_server" {print $2; exit}')
+    ngx_port=$(grep -rhoE 'listen[[:space:]]+[0-9]+' /etc/nginx/sites-available /etc/nginx/conf.d 2>/dev/null | awk '{print $2; exit}')
+  fi
+  echo -n '    "nginx_server_name": '; json_opt_str "${ngx_name}"; echo ','
+  echo -n '    "nginx_port": '; json_opt_str "${ngx_port}"; echo ','
+  # 端口扫描 (回环 listen, 含本机服务端口)
+  scan_ports="22 80 443 1080 7890 8787 8765 8767 8090 8000 8080 8443 22022 2222"
+  echo -n '    "listen_ports": ['
+  FIRST=1
+  for port in $scan_ports; do
+    if timeout 1 bash -c "echo > /dev/tcp/127.0.0.1/$port" 2>/dev/null; then
+      if [ $FIRST -eq 1 ]; then FIRST=0; else printf ','; fi
+      printf '"%s"' "$port"
+    fi
+  done
+  echo ' ]'
+  echo '  },'
 
 # ---------- codebase-memory-mcp ----------
 echo '  "codebase_mcp": {'
