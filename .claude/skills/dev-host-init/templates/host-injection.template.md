@@ -642,12 +642,14 @@ Layer 1 — 图谱查询（必须优先）
    项目未索引 / 索引过期？ → 先走 Layer 2，完成后回到本层
    不满足 ↓（仅当图谱确实无法回答）
 
-Layer 2 — 索引保障（未索引 / embedding 过期时）
+Layer 2 — 索引保障（关键：重新 embedding，禁止跳过图谱直读）
    未索引：index_repository 建索引（repo_path=项目根，模式按规模选 full/moderate/fast）
-   过期（代码比索引新）：detect_changes 检查影响，或 index_repository 重新索引
-   完成后回到 Layer 1 —— 不允许索引完直接读文件
+   过期（代码比索引新：未提交变更/本次新写/他人刚 push）：detect_changes 检查影响，
+        或 index_repository 重新 embedding
+   ⚠️ 完成后【必须回到 Layer 1 再查一次】——索引追上代码后通常就命中了
+   ❌ 禁止"搜不到 → 跳过图谱 → 直接 read"（index 干废的根源）
 
-Layer 3 — 直读兑底（final fallback）
+Layer 3 — 直读兑底（final fallback，仅在重索引后仍搜不到时）
    先 index_status / 图谱查询确认已索引
    然后 read(path) 读具体文件/行号
 ```
@@ -657,6 +659,7 @@ Layer 3 — 直读兑底（final fallback）
 - **不允许**跳过 Layer 1 直接 read/grep 代码文件（非代码文件不受限）
 - **不允许**索引建成后不查图谱直接读
 - **不允许**在任何能调用 Layer 1 工具的场合直接 `ls` 或 `read` 代码文件
+- **不允许"搜不到就跳读"**：空结果先查参数 → 参数无误则重新 embedding → 回图谱重查 → 仍无才兜底 read
 - 当 trace / search 返回空结果时，**先检查参数是否正确**（函数名拼写、label 类型、过滤条件），而不是立即 fallback 到读文件
 - pi 平台由 graph-first-gate 扩展硬性拦截执行；其他平台靠本规则自律
 
@@ -673,12 +676,13 @@ Layer 3 — 直读兑底（final fallback）
 
 ## 注意事项
 
-1. **`trace_path` 和 `search_graph` 返回空时**：先检查参数（函数名拼写、label 类型、方向），不是直接跳过图谱去读文件
+1. **`trace_path` 和 `search_graph` 返回空时**：先检查参数（拼写/label/方向/项目名），参数无误仍空 → 索引过期（embedding 未跟上新代码）→ **重新 embedding 再回图谱重查**，不是直接跳过图谱去读文件
 2. **`get_code_snippet`**：只返回 symbol 本体代码，不包含上下文；如果需要看实现细节，先 snippet 再 `read` 指定行号范围
 3. **`query_graph`**：是最灵活的底层查询工具，任何图谱层面找关系的问题都可以用它
 4. **不确定 symbol 名称**：先用 `search_graph(name_pattern=".*")` 搜到准确名字
 5. **同时涉及多个文件的改动**：用 `detect_changes()` 定位影响范围，再针对重点 symbol 用 `trace_path`
-6. **未索引的文件**：如果 `index_status` / `search_code(files)` 说未索引，需要先索引项目，不要直接读取大段源码
+6. **未索引的文件**：如果 `index_status` / `search_code(files)` 说未索引，需要先索引项目，重新 embedding 后回到图谱重查，不要直接读取大段源码
+7. **代码改了但图谱没更新**（本会话新写/未提交变更/他人刚 push）：图谱可能查不到新 symbol——用 `detect_changes` 或重新 `index_repository`，让 embedding 追上代码后再查，禁止跳过图谱直接 read
 
 ## 快速决策树
 
@@ -690,7 +694,11 @@ Layer 3 — 直读兑底（final fallback）
 │  3. 找函数/类？         → search_graph    │
 │  4. 搜关键词？           → search_code     │
 │  5. 关系查询？（继承/调用等）→ query_graph  │
-│  6. 看具体实现？         → 先 Layer 1-2    │
+│  6. 图谱搜不到/空结果？  → ①查参数 ②重新   │
+│                           embedding(索引保障)│
+│                          ③回图谱重查         │
+│  7. 重查仍搜不到才直读  → 先 index_status   │
+│                          再 read (行级)      │
 │                         再 get_code_snippet│
 │                         最后 read (行级)   │
 └───────────────────────────────────────────┘
