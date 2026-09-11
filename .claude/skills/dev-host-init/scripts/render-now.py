@@ -204,15 +204,17 @@ values["ENV_TABLE"] = ("conda: " + ", ".join(conda_envs or ["未检测到"])
                        + ("\nuv python: " + ", ".join(uv_pythons[:8]) if uv_pythons else ""))
 
 if aliases:
-    values["PREFERENCES_SUMMARY"] = (
+    d = (
         "主力语言：Python + Node.js/TypeScript + R（生信出图）；Bash/批处理辅助。\n"
         "包管理器：Node 用 pnpm(>npm>bun)、Python 用 uv(>conda>pip)、R 用 renv/conda。\n"
         "领域路线图：开发/全栈、量化金融、科研、Data Science、生命科学/生信、可视化美术设计。\n"
         "日常任务：开发/调试/文档/调研/上线运维、生信分析（Seurat/Bioc/R 出图）。\n"
-        f"远程跳板别名（~/.ssh/config 解析）：{', '.join(aliases[:6])}" if aliases else ""
-        f"。\n路径约定：开发 {DEV_ROOT}、学术 ~/R、MCP server 开发 {DEV_ROOT} 或 ~/mcp。\n"
+        + (f"远程跳板别名（~/.ssh/config 解析）：{', '.join(aliases[:6])}。\n" if aliases else "")
+        + f"路径约定：开发 {DEV_ROOT}、学术 ~/R、MCP server 开发 {DEV_ROOT} 或 ~/mcp。\n"
         + (f"问卷补充：{prefs_extra}\n" if prefs_extra else "")
         + "完整问卷见 agent-reference/preferences.md，此处为常驻摘要。")
+    if aliases:
+        values["PREFERENCES_SUMMARY"] = d
 else:
     values["PREFERENCES_SUMMARY"] = (
         "主力语言：Python + Node.js/TypeScript + R（生信出图）；Bash/批处理辅助。\n"
