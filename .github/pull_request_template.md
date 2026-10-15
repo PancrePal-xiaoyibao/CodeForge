@@ -39,6 +39,7 @@ Closes #
 - [ ] 无 AI 冒充人工的场景（有 AI 辅助均已披露）
 
 ## 本地验证
+- [ ] `python3 scripts/validate-skills.py` 通过（frontmatter / 编码 / 行尾 / 三镜像）
 - [ ] 单元测试通过（如适用）
 - [ ] 集成测试通过（如适用）
 - [ ] `/code-review` 无 High 级问题

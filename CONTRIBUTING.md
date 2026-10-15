@@ -229,10 +229,34 @@ Fork → 特性分支 → 修改**三镜像**（`.claude/`、`.codex/`、`.gemin
 
 - [ ] **三镜像同步** — `.claude/` + `.codex/` + `.gemini/` 三个版本同时修改（**最严格的规则**）
 - [ ] **frontmatter 完整** — `name` + `description`，description 说明触发条件
-- [ ] **关联 Skill 段** — 若改动影响 skill 间路由，更新相关 skill 关联段并保证双向一致
+- [ ] **跑一遍元数据校验** — `python3 scripts/validate-skills.py`（CI 同款门禁，见下方说明）
+- [ ] **关联 Skill 段** — 若改动影响 skill 间路由，更新相关关联段并保证双向一致
 - [ ] **无死链** — `scripts/` `references/` 引用路径真实存在
 - [ ] **入口文档同步** — `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` 三个入口的路由表 / 命令列表都要更
 - [ ] **本地验证** — 在至少一个平台实际跑一遍该 skill
+
+#### 元数据校验（`scripts/validate-skills.py`）
+
+**为什么有这个脚本**：曾有 skill（`ai-spec`）长期缺 frontmatter，导致 Codex / Gemini 直接拒绝加载——
+frontmatter 是这两个平台**发现 skill 的唯一入口**，缺了就等于该 skill 不存在。
+为防同类问题再静默进入 `main`，仓库加了元数据门禁，本地与 CI 共用同一个脚本。
+
+```bash
+python3 scripts/validate-skills.py            # 全量校验；有阻塞问题则退出码 1
+python3 scripts/validate-skills.py --quiet    # 只打印问题
+```
+
+校验规则（对齐 Codex 官方 `skill-creator/quick_validate.py` 的判定门槛）：
+
+| 级别 | 检查项 |
+|------|--------|
+| **ERROR** | SKILL.md 缺 frontmatter（首行非 `---`）；缺 `name` / `description`；`name` 非 `[a-z0-9-]`、超 64 字符、以 `-` 起止或含连续 `--`；`description` 为空、超 1024 字符、含 `<` `>`、或含未完成的 `[TODO:`；frontmatter 含白名单外的键；UTF-8 BOM；`CR` / `CRLF` 行尾；某平台镜像缺该 skill；`.claude/commands/*.md` 缺 `description` |
+| **WARN** | 同一 skill 三镜像正文不一致（历史技术债，逐批收敛） |
+
+两条容易踩的坑：
+
+1. **`description` 不要含 `<` `>`，也不要含裸冒号+空格**（`xxx: yyy`）。前者被校验器直接判失败，后者 YAML 会把它解析成映射而非字符串。需要冒号时给整串加引号。
+2. **文件不要带 BOM、不要用 CRLF**。BOM 会占掉首字节使 `^---` 匹配失败；CRLF 会让首行变成 `---\r`，严格解析器读不到 frontmatter。仓库已加 `.gitattributes`（统一 LF，仅 `.ps1`/`.bat`/`.cmd` 保留 CRLF）。
 
 ### B.3 新增 Skill 的标准结构
 
@@ -312,11 +336,12 @@ chore(scope): 构建、CI、脚手架
 
 维护者会重点检查：
 1. ✅ CodeForge 三镜像一致性（Path B/C）
-2. ✅ ETHICS.md 合规（所有 Path）
-3. ✅ AI 辅助披露完整（所有 Path）
-4. ✅ description 触发条件清晰
-5. ✅ 无死链、无格式错误
-6. ✅ 与主入口文档的路由表一致
+2. ✅ skill 元数据合规（`python3 scripts/validate-skills.py` 通过，CI 自动跑）
+3. ✅ ETHICS.md 合规（所有 Path）
+4. ✅ AI 辅助披露完整（所有 Path）
+5. ✅ description 触发条件清晰
+6. ✅ 无死链、无格式错误
+7. ✅ 与主入口文档的路由表一致
 
 ---
 

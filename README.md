@@ -423,6 +423,10 @@ CodeForge 把 agent 分两类，**判定标准只有一个**：该 agent 有没�
 
 **一个 prompt → 改 skill → 三镜像同步 → fork → PR**。详见 [CONTRIBUTING.md § Path C](./CONTRIBUTING.md#-path-c--agent-自我优化闭环最酷的玩法)。
 
+> 🧪 **改完 skill 先跑一次自检**：`python3 scripts/validate-skills.py`
+> 它校验 frontmatter（`name` + `description`）、编码（BOM）、行尾、以及三镜像 skill 是否齐全。
+> 缺 frontmatter 会让 Codex / Gemini **直接拒载该 skill**（曾有 skill 因此长期不可用），CI 也会在 push / PR 时拦下同类问题。
+
 ---
 
 ## 📜 License & Ethics
