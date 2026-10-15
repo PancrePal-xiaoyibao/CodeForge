@@ -20,7 +20,7 @@ from pathlib import Path
 def extract_frontmatter(filepath: Path) -> dict:
     """从 SKILL.md 或 command .md 提取 frontmatter"""
     try:
-        content = filepath.read_text(encoding="utf-8")
+        content = filepath.read_text(encoding="utf-8-sig")  # 容忍 BOM，避免 ^--- 匹配失败静默丢 frontmatter
     except Exception:
         return {}
     match = re.match(r"^---\s*\n(.*?)\n---", content, re.DOTALL)
@@ -121,7 +121,7 @@ def update_entry_doc(filepath: Path, skill_section: str, platform_label: str):
     marker_end = f"<!-- SKILL-LIST-END -->"
 
     if filepath.exists():
-        content = filepath.read_text(encoding="utf-8")
+        content = filepath.read_text(encoding="utf-8-sig")  # 读入口文档同样容忍 BOM
     else:
         content = f"# {platform_label} Entry\n\n{marker_start}\n{marker_end}\n"
 
