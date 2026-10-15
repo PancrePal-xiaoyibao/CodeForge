@@ -3,6 +3,7 @@ name: sam-dev-cc-init
 description: PDCO 循环开发工作流初始化工具。当用户输入 sam-init、pdco、init-pdco 或需要建立项目开发规范时使用。为 AI 辅助编程项目快速建立 CLAUDE.md、PROGRESS-LOG.md、任务管理、经验沉淀机制和智能评估系统。适合任何需要系统化开发流程、质量管理和激励机制的项目。
 ---
 
+
 # Sam Dev CC Init — PDCO 开发工作流初始化
 
 为任何新项目快速建立完整的 AI 辅助开发规范。
@@ -57,7 +58,6 @@ project-root/
 ### Step 4: 输出结果
 显示创建的文件清单（创建/跳过）、文件说明、下一步建议、常用命令提示。
 
----
 
 ## PDCO 开发循环（CHECKFIX 零错误部署）
 
@@ -88,7 +88,6 @@ project-root/
 | CHECK | `.checkfix/` + 测试 | **验证 CHECKFIX** + 测试 | 命令 |
 | OPT | `PROGRESS-LOG.md` + `self.opt` | 进度日志 + 经验沉淀 | 手动编辑 |
 
----
 
 ## 会话恢复（5-Question Reboot Test）
 
@@ -102,7 +101,6 @@ project-root/
 | What have I learned? | `self.opt` 中的经验沉淀 |
 | What have I done? | `PROGRESS-LOG.md` 中的记录 |
 
----
 
 ## 开发循环（PDCO）
 
@@ -133,7 +131,6 @@ project-root/
 
 **→ 返回 PLAN，领取下一个任务（带着进化后的认知）**
 
----
 
 ## 关键规则
 
@@ -152,7 +149,6 @@ ATTEMPT 3: 重新思考 → 质疑假设 → 搜索解决方案 → 考虑更新
 AFTER 3 FAILURES: 升级给用户 → 解释尝试过的方法 → 分享具体错误 → 请求指导
 ```
 
----
 
 ## 模板内容参考
 
@@ -191,7 +187,6 @@ AFTER 3 FAILURES: 升级给用户 → 解释尝试过的方法 → 分享具体�
 - 假设验证记录：做过的假设及其验证结果
 - 记录决策树：帮助 AI 判断「什么值得记录」
 
----
 
 ## Token 动态预算管理
 
@@ -210,7 +205,6 @@ AFTER 3 FAILURES: 升级给用户 → 解释尝试过的方法 → 分享具体�
 **惩罚**：跳过 CHECKFIX -50 · 生产 bug -30/个 · 不记录经验 -10 · Token 预估严重偏离 -10
 **兑现**：101+ 分 → 快速通道/任务优先；<50 分 → 强制质量培训/二级审查
 
----
 
 ## 更新机制
 

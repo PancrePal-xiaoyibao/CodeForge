@@ -246,6 +246,8 @@ Each iteration is a **fresh Amp instance** with clean context.
 |------|---------|
 | `.claude/scripts/ralph.sh` | The bash loop that spawns Amp instances |
 | `.claude/scripts/prompt.md` | Instructions given to each Amp instance |
+| `scripts/ralph.sh` | Portable copy of the bash loop（非 Claude 运行时） |
+| `prompt.md` | Portable copy of the Amp prompt（非 Claude 运行时） |
 | `prd.json` | User stories with `passes` status |
 | `prd-progress.txt` | Append-only learnings log |
 | `.claude/archive/` | Previous run archives |

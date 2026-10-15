@@ -316,25 +316,30 @@ def check_mirrors(issues: list[Issue], quiet: bool) -> tuple[int, int]:
             issues.append(Issue("ERROR", f"mirror:{name}", "mirror-missing-skill",
                                 f"skill 存在于 {have}，但 {'/'.join(missing)} 镜像缺失"))
 
-    # 正文一致性（WARN：历史技术债，逐批收敛）
-    drift = []
+    # 正文一致性规则（2026-10-15 确立，见 CONTRIBUTING.md）：
+    #   - claude 与 gemini 都存“完整版”，两者必须逐字一致 → 不一致报 ERROR
+    #   - codex 允许独立精简版（Overview / Workflow / Output Contract 结构，受 token 预算约束）
+    #     → 与 claude/gemini 不一致不算违规，仅统计
+    cg_drift = []
+    codex_independent = 0
     for name in all_names:
-        bodies = {}
-        for platform, table in (("codex", codex), ("gemini", gemini), ("claude", claude)):
-            p = table.get(name)
-            if p is None:
-                continue
-            bodies[platform] = body_of(read_text(p, []))
-        if len(bodies) >= 2 and len(set(bodies.values())) > 1:
-            drift.append(name)
-            issues.append(Issue("WARN", f"mirror:{name}", "mirror-drift",
-                                "三镜像正文不一致：" + "、".join(
-                                    f"{k}={len(v.splitlines())}行" for k, v in sorted(bodies.items()))))
+        cb = body_of(read_text(claude[name], [])) if name in claude else None
+        gb = body_of(read_text(gemini[name], [])) if name in gemini else None
+        xb = body_of(read_text(codex[name], [])) if name in codex else None
+        if cb is not None and gb is not None and cb != gb:
+            cg_drift.append(name)
+            issues.append(Issue(
+                "ERROR", f"mirror:{name}", "claude-gemini-drift",
+                f"claude 与 gemini 正文必须一致（两者都是完整版）："
+                f"claude={len(cb.splitlines())}行、gemini={len(gb.splitlines())}行",
+            ))
+        elif xb is not None and xb != cb and xb != gb:
+            codex_independent += 1
 
     if not quiet:
         print(f"  [mirror] 三镜像 skill 集合：codex={len(codex)} gemini={len(gemini)} claude={len(claude)}"
-              f"，正文漂移 {len(drift)}/{len(all_names)}")
-    return len(all_names), len(drift)
+              f"；claude↔gemini 不一致 {len(cg_drift)} 个；codex 独立精简版 {codex_independent} 个（允许）")
+    return len(all_names), len(cg_drift)
 
 
 def check_claude_commands(issues: list[Issue], quiet: bool) -> int:
@@ -449,7 +454,8 @@ def main() -> int:
     args = parser.parse_args()
 
     issues: list[Issue] = []
-    if not args.quiet and not args.json:
+    quiet = args.quiet or args.json          # --json 时也静默进度行，否则 JSON 前混入文本导致解析失败
+    if not quiet:
         print("CodeForge skill 合规校验")
         print("=" * 62)
 
@@ -460,11 +466,11 @@ def main() -> int:
             skill_count += 1
             validate_skill_md(path, issues, platform=platform)
 
-    total_skills, drift = check_mirrors(issues, args.quiet)
-    cmd_count = check_claude_commands(issues, args.quiet)
-    text_count = check_text_hygiene(issues, args.quiet)
+    total_skills, drift = check_mirrors(issues, quiet)
+    cmd_count = check_claude_commands(issues, quiet)
+    text_count = check_text_hygiene(issues, quiet)
     all_skill_names = set(mirrors["codex"]) | set(mirrors["gemini"]) | set(mirrors["claude"])
-    ref_count = check_skill_refs(issues, all_skill_names, args.quiet)
+    ref_count = check_skill_refs(issues, all_skill_names, quiet)
 
     errors = [i for i in issues if i.level == "ERROR"]
     warns = [i for i in issues if i.level == "WARN"]
@@ -491,7 +497,7 @@ def main() -> int:
             print()
             print("=" * 62)
             print(f"  skill 检查 {skill_count} 个 | command {cmd_count} 个 | 文本文件 {text_count} 个")
-            print(f"  关联 Skill 引用 {ref_count} 条；三镜像正文漂移 {drift}/{total_skills} 个（WARN，历史技术债）")
+            print(f"  关联 Skill 引用 {ref_count} 条；claude↔gemini 正文不一致 {drift}/{total_skills} 个")
             if not errors:
                 print(f"  ✅ 无阻塞问题（{len(warns)} 条提示）")
             else:

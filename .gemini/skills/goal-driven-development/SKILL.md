@@ -3,6 +3,7 @@ name: goal-driven-development
 description: 批准后 SPEC 的证据化执行引擎 — 将已批准的工程 SPEC 转化为持久的、带证据的目标循环，逐里程碑实现、跑确定性检查、执行 spec-aware 审查，并在独立的 commit / push 授权门处停止。在 intent / 项目健康 / PRD / SPEC 批准后使用；不适用于模糊需求、未批准 spec、一次性解释、或未经明确授权的自动 commit/push。
 ---
 
+
 # Goal-Driven Development
 
 ## Overview

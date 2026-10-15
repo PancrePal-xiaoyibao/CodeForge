@@ -173,9 +173,9 @@ description: API-First 模块化开发框架。后端功能独立封装为 API �
 #### 调用示例
 
 ```bash
-curl -X POST https://host/api/v1/xxx 
-  -H "Content-Type: application/json" 
-  -H "Authorization: Bearer {token}" 
+curl -X POST https://host/api/v1/xxx \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer {token}" \
   -d '{"field1": "value"}'
 ```
 

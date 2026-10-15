@@ -3,6 +3,7 @@ name: project-health-audit
 description: 证据驱动的项目健康与技术债基线扫描 — 在 PRD / SPEC / 重构 / 迁移 / 大型功能开发之前使用。检查 build/test/lint 状态、架构热点、依赖与安全风险、mock/stub/TODO、文档漂移、迁移与近期变更热点，并把债务分类为 BEFORE_CHANGE / DURING_CHANGE / AFTER_CHANGE。不执行未被单独授权的修复。
 ---
 
+
 # Project Health Audit
 
 ## Overview

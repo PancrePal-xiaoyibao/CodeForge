@@ -280,4 +280,5 @@ Before saving the PRD:
 | 关系 | Skill | 场景 |
 |------|-------|------|
 | 可调用 | ralph / ralph-yolo | PRD 完成后进入自动实现 |
+| 可调用 | intent-grill | PRD 生成前深度对齐需求 |
 | 被调用 | ai-spec | 主调度分诊需要 PRD 文档 |

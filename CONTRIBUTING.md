@@ -228,6 +228,8 @@ Fork → 特性分支 → 修改**三镜像**（`.claude/`、`.codex/`、`.gemin
 **优化 skill 的检查清单：**
 
 - [ ] **三镜像同步** — `.claude/` + `.codex/` + `.gemini/` 三个版本同时修改（**最严格的规则**）
+      - **`claude` 与 `gemini` 必须逐字一致**（两者都存「完整版」）— 不一致会被门禁判 **ERROR**
+      - **`codex` 允许独立精简版**（Overview / Workflow / Output Contract 结构，受 Codex token 预算约束）
 - [ ] **frontmatter 完整** — `name` + `description`，description 说明触发条件
 - [ ] **跑一遍元数据校验** — `python3 scripts/validate-skills.py`（CI 同款门禁，见下方说明）
 - [ ] **关联 Skill 段** — 若改动影响 skill 间路由，更新相关关联段并保证双向一致
@@ -251,8 +253,8 @@ python3 scripts/validate-skills.py --quiet    # 只打印问题
 
 | 级别 | 检查项 |
 |------|--------|
-| **ERROR** | SKILL.md 缺 frontmatter（首行非 `---`）；缺 `name` / `description`；`name` 非 `[a-z0-9-]`、超 64 字符、以 `-` 起止或含连续 `--`；`description` 为空、超 1024 字符、含 `<` `>`、或含未完成的 `[TODO:`；frontmatter 含白名单外的键；UTF-8 BOM；`CR` / `CRLF` 行尾；某平台镜像缺该 skill；`.claude/commands/*.md` 缺 `description` |
-| **WARN** | 同一 skill 三镜像正文不一致（历史技术债，逐批收敛） |
+| **ERROR** | SKILL.md 缺 frontmatter（首行非 `---`）；缺 `name` / `description`；`name` 非 `[a-z0-9-]`、超 64 字符、以 `-` 起止或含连续 `--`；`description` 为空、超 1024 字符、含 `<` `>`、或含未完成的 `[TODO:`；frontmatter 含白名单外的键；UTF-8 BOM；`CR` / `CRLF` 行尾；某平台镜像缺该 skill；**`claude` 与 `gemini` 正文不一致**；「关联 Skill」表引用了不存在的 skill；`.claude/commands/*.md` 缺 `description` |
+| **不计为问题** | `codex` 与 `claude`/`gemini` 正文不一致 — 这是**有意设计**（Codex 用精简版），脚本只在摘要里统计个数 |
 
 两条容易踩的坑：
 
@@ -269,12 +271,18 @@ python3 scripts/validate-skills.py --quiet    # 只打印问题
    ├── scripts/          # 可选：.py/.ps1/.sh
    └── references/       # 可选：静态文档
 
-2. 同步 Gemini 镜像
+2. 同步 Gemini 镜像 — **正文必须与 Claude 版逐字一致（完整版）**
    .gemini/skills/<your-skill>/SKILL.md  (frontmatter: name + description)
 
-3. 同步 Claude 镜像
+3. 同步 Claude 镜像 — **正文必须与 Gemini 版逐字一致（完整版）**
    .claude/skills/<your-skill>.md 或 .claude/skills/<your-skill>/SKILL.md
    .claude/commands/<your-skill>.md      # slash command 入口
+
+   > **真源与完整度规则（2026-10-15 确立）**
+   > - `.codex` 是**真源**，可以是**精简版**（Overview / Workflow / Output Contract）
+   > - `.claude` 与 `.gemini` 两者都存**完整版**，且必须**逐字一致**（门禁判 ERROR）
+   > - 「完整版」指的是：可执行模板、逐步骤清单、输出格式、失败处理都在。只留概览而把模板删掉，**不算精简版，算信息丢失**
+   > - 改 skill 顺序：先改 codex → 把完整内容同步到 claude + gemini → 跑 `python3 scripts/validate-skills.py` 确认零 ERROR
 
 4. 更新入口文档
    CLAUDE.md / AGENTS.md / GEMINI.md 里的技能矩阵和路由表

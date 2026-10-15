@@ -192,7 +192,7 @@ jobs:
 - uses: dtolnay/rust-toolchain@stable
   with:
     targets: ${{ matrix.target }}
-- uses: cross-rs/cross-action@v2
+- uses: cross-rs/cross-action@v2  # For cross-compilation
   with:
     target: ${{ matrix.target }}
     command: build --release
@@ -226,8 +226,9 @@ jobs:
 - uses: subosito/flutter-action@v2
   with:
     flutter-version: '3.22'
-- run: flutter build apk --release
-- run: flutter build appbundle --release
+- run: flutter build apk --release        # Android APK
+- run: flutter build appbundle --release   # Android AAB
+# iOS requires macOS runner + certificate
 - run: flutter build ios --release --no-codesign
   if: runner.os == 'macOS'
 ```
@@ -265,7 +266,7 @@ jobs:
   with:
     distribution: 'temurin'
     java-version: '17'
-- run: ./gradlew build
+- run: ./gradlew build          # or: mvn package
 ```
 
 **R Package**
@@ -303,7 +304,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        version: ['3.10', '3.11', '3.12']
+        version: ['3.10', '3.11', '3.12']  # ecosystem-specific
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
@@ -344,12 +345,12 @@ jobs:
           generate_release_notes: true
 ```
 
-### Family E: Full Pipeline (Lint -> Build -> Test -> Release)
+### Family E: Full Pipeline (Lint → Build → Test → Release)
 
 ```
-lint --|
-       |--> build --> test --> release (tag only)
-format-|
+lint ──┐
+       ├──→ build ──→ test ──→ release (tag only)
+format ┘
 ```
 
 ---

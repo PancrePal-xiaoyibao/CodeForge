@@ -36,16 +36,6 @@ Ralph YOLO 是 Ralph 的轻量版本，直接使用 Claude Code 的 Task tool �
 /ralph-yolo                           # 自动查找 prd.json
 ```
 
-## 关联 Skill（网络调度协议）
-
-| 关系 | Skill | 场景 |
-|------|-------|------|
-| 可调用 | code-debugger | YOLO 执行中遇到错误 |
-| 可调用 | nodejs-npm-auto-release | 全部故事完成后发布 |
-| 被调用 | ai-spec | 主调度路由到自动开发(YOLO) |
-| 被调用 | prd | PRD 完成后启动 YOLO |
-| 被调用 | api-first-modular | API 设计完成进入 YOLO 实现 |
-
 ---
 
 ## 工作流程
@@ -621,3 +611,13 @@ git checkout -b ralph/feature-name
 ---
 
 **准备好运行 Ralph YOLO 了喵～ 提供 PRD 路径进行转换，或者浮浮酱会使用现有的 prd.json** φ(≧ω≦*)♪
+
+## 关联 Skill（网络调度协议）
+
+| 关系 | Skill | 场景 |
+|------|-------|------|
+| 可调用 | code-debugger | YOLO 执行中遇到错误 |
+| 可调用 | nodejs-npm-auto-release | 全部故事完成后发布 |
+| 被调用 | ai-spec | 主调度路由到自动开发(YOLO) |
+| 被调用 | prd | PRD 完成后启动 YOLO |
+| 被调用 | api-first-modular | API 设计完成进入 YOLO 实现 |

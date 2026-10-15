@@ -3,6 +3,7 @@ name: discover-skill-opportunities
 description: 技能机会发现引擎 — 分析会话导出、任务日志、项目工件、SOP、ticket、报告与工作历史，发现隐藏工作模式，排序值得打包为 AI skill 的可复用工作流。同时复盘当前会话实际加载/调用的 skill 表现（哪里有用、哪里有摩擦、是否应升级）。适用于：用户问"我反复在做什么"、"我漏了什么"、"哪些流程该做成 skill"、证据驱动的 skill 机会审计、或复盘当前会话 skill 表现。
 ---
 
+
 # Discover Skill Opportunities
 
 ## Overview

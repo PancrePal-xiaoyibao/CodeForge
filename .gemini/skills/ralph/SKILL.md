@@ -246,8 +246,8 @@ Each iteration is a **fresh Amp instance** with clean context.
 |------|---------|
 | `.claude/scripts/ralph.sh` | The bash loop that spawns Amp instances |
 | `.claude/scripts/prompt.md` | Instructions given to each Amp instance |
-| `scripts/ralph.sh` | Portable copy of the bash loop (non-Claude runtimes) |
-| `prompt.md` | Portable copy of the Amp prompt (non-Claude runtimes) |
+| `scripts/ralph.sh` | Portable copy of the bash loop（非 Claude 运行时） |
+| `prompt.md` | Portable copy of the Amp prompt（非 Claude 运行时） |
 | `prd.json` | User stories with `passes` status |
 | `prd-progress.txt` | Append-only learnings log |
 | `.claude/archive/` | Previous run archives |
@@ -290,6 +290,18 @@ Ralph won't commit broken code. Check:
 4. **Clean git state** - Start with a clean working directory
 5. **Monitor progress** - Check `prd-progress.txt` and git log regularly
 
+## 关联 Skill（网络调度协议）
+
+| 关系 | Skill | 场景 |
+|------|-------|------|
+| 可调用 | code-debugger | 自动开发遇到错误时 |
+| 可调用 | code-review | 每轮实现后作为质量门审查 |
+| 可调用 | codebase-context | 开发前理解架构约束 |
+| 可调用 | nodejs-npm-auto-release | 开发完成需要发布 |
+| 被调用 | ai-spec | 主调度路由到自动开发 |
+| 被调用 | prd | PRD 完成后启动开发循环 |
+| 被调用 | api-first-modular | API 设计完成进入实现 |
+
 ---
 
 ## Example Session
@@ -315,13 +327,3 @@ Iteration 4: US-004 - Filter tasks by priority ✓
 
 All stories completed! Check prd-progress.txt for details.
 ```
-
-## 关联 Skill（网络调度协议）
-
-| 关系 | Skill | 场景 |
-|------|-------|------|
-| 可调用 | code-debugger | 自动开发遇到错误时 |
-| 可调用 | nodejs-npm-auto-release | 开发完成需要发布 |
-| 被调用 | ai-spec | 主调度路由到自动开发 |
-| 被调用 | prd | PRD 完成后启动开发循环 |
-| 被调用 | api-first-modular | API 设计完成进入实现 |

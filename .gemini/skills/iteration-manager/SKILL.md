@@ -3,6 +3,7 @@ name: iteration-manager
 description: 交付后迭代管理引擎 — 把交付结果、用户验收、审查发现、生产信号、事故、指标与推迟债务转化为下一轮受控开发迭代。在 goal 交付/停止/部分验收后使用，判定证据需要 bug 修复、债务项、PRD 修订、SPEC 修订还是新变更。不静默改写已批准的历史 PRD/SPEC 工件，不未经下一批准就启动实现。
 ---
 
+
 # Iteration Manager
 
 ## Overview

@@ -3,6 +3,7 @@ name: codebase-context
 description: 代码库知识图谱接口 — 将代码库索引为依赖/调用链/聚类/执行流图谱，暴露查询工具供其他 skill 获取架构理解。优先使用 codebase-memory MCP 图谱（search_graph / trace_path / query_graph / get_architecture），无 MCP 时降级 GitNexus，再降级静态分析。触发词：探索代码库、理解架构、谁调用了 X、X 调用了什么、调用链、影响分析、依赖分析、死代码、高扇出、重构候选、Cypher 查询、跨服务调用。
 ---
 
+
 # Codebase Context — 代码库"神经系统"架构师
 
 为其他 skill 提供深度架构查询。图谱工具一次返回精确结构结果（~500 tokens），大范围 grep 同样问题要 ~80K tokens。
