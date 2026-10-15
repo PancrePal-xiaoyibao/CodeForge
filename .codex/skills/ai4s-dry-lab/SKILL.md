@@ -1,7 +1,8 @@
 ---
 name: ai4s-dry-lab
 description: AI4S 端到端干实验自动化研究引擎。自启动检查+追溯入职(半路加入也能补齐历史)+强制Worklog(W1)+输出目录README(W2)+强制文献验证(W3)+强制脚本日志(W4)+分层记忆注入+SPEC驱动+OODA循环+Gate门控。适用于scRNA-seq/空间转录组/跨物种比较等计算生物学项目。
-version: 2.2.0
+metadata:
+  version: 2.2.0
 ---
 
 # AI4S Dry Lab — 端到端干实验自动化研究引擎

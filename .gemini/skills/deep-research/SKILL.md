@@ -1,7 +1,8 @@
 ---
 name: deep-research
 description: 深度调研技能 - 完全内置的多 Agent 并行执行引擎，支持引用管理、文件发送、轻量量化验证和实时进度反馈。支持 2-8 个内置 agent 同时工作，大幅提升 Token 使用效率和执行速度。
-version: 2.3.0
+metadata:
+  version: 2.3.0
 ---
 
 # Deep Research - 深度调研技能（引用管理 + 文件发送 + 轻量量化验证）

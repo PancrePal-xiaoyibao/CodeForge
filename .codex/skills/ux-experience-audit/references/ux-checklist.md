@@ -1,4 +1,4 @@
-﻿# UX Checklist
+# UX Checklist
 
 ## 1. Core User Path
 

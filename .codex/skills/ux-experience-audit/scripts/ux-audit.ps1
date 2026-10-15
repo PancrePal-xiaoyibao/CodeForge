@@ -1,4 +1,4 @@
-﻿param(
+param(
   [ValidateSet("scan", "checkfix", "full")]
   [string]$Mode = "full",
   [string]$ProjectRoot = "."

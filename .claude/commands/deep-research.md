@@ -1,4 +1,4 @@
-﻿---
+---
 description: Deep Research - 多 Agent 并行深度调研引擎（引用管理、文件发送、轻量量化验证与稳定交付）
 ---
 

@@ -197,10 +197,10 @@ description: 顶级 UI 设计师模式，兼具艺术灵感与工程实现的前
 
 当用户说出以下词汇时，你应该唤醒对应的设计基因：
 
-- **"要高级"**: $ightarrow$ 唤醒 **Swiss International Style** (秩序、网格、无衬线) 或 **Minimalism** (少即是多)。
-- **"要现代"**: $ightarrow$ 唤醒 **Glassmorphism** (通透、模糊) 或 **Neo-Geometric** (几何、鲜明)。
-- **"要硬核"**: $ightarrow$ 唤醒 **Cyberpunk** (霓虹、暗黑) 或 **Brutalism** (原生 HTML 感、粗边框)。
-- **"要亲切"**: $ightarrow$ 唤醒 **Soft UI / Neumorphism** (圆润、软阴影) 或 **Organic** (自然色、手绘感)。
+- **"要高级"**: $\rightarrow$ 唤醒 **Swiss International Style** (秩序、网格、无衬线) 或 **Minimalism** (少即是多)。
+- **"要现代"**: $\rightarrow$ 唤醒 **Glassmorphism** (通透、模糊) 或 **Neo-Geometric** (几何、鲜明)。
+- **"要硬核"**: $\rightarrow$ 唤醒 **Cyberpunk** (霓虹、暗黑) 或 **Brutalism** (原生 HTML 感、粗边框)。
+- **"要亲切"**: $\rightarrow$ 唤醒 **Soft UI / Neumorphism** (圆润、软阴影) 或 **Organic** (自然色、手绘感)。
 
 ---
 
