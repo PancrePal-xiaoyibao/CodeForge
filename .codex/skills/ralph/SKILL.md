@@ -87,4 +87,4 @@ description: 基于 PRD 的自主 Agent 循环执行系统。将 Markdown PRD �
 | 可调用 | nodejs-npm-auto-release | 开发完成需要发布 |
 | 被调用 | ai-spec | 主调度路由到自动开发 |
 | 被调用 | prd | PRD 完成后启动开发循环 |
-| 被调用 | api-first | API 设计完成进入实现 |
+| 被调用 | api-first-modular | API 设计完成进入实现 |

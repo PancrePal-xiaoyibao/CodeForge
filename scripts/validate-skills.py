@@ -71,6 +71,12 @@ SKIP_DIRS = {".git", "__pycache__", "node_modules", ".debug", ".venv", "venv", "
 # 校验器必须尊重这条约定，否则会误报合法的 PowerShell 脚本。
 CRLF_EXPECTED_SUFFIXES = {".ps1", ".bat", ".cmd"}
 
+# 「关联 Skill」表校验：跳过表头与分隔行，数据行校验第 2 列（Skill 名）存在。
+# 第 1 列就是关系词（被调用 / 可调用 / 配合…），所以不能用关系词做 skip 条件，
+# 否则会把所有数据行都跳掉（写这一版时真踩过：注入错名 deep-reserch 却报绿）。
+TABLE_HEADER_FIRST_CELL = "关系"
+MARKDOWN_ROW_NOISE = {"-", "—", "n/a", "na", "none", "None"}
+
 
 # --------------------------------------------------------------------------
 # YAML 解析：优先 PyYAML，缺失时降级到极简解析器（覆盖 frontmatter 实际用法）
@@ -381,6 +387,60 @@ def check_text_hygiene(issues: list[Issue], quiet: bool) -> int:
 # --------------------------------------------------------------------------
 # main
 # --------------------------------------------------------------------------
+def check_skill_refs(issues: list[Issue], all_names: set[str], quiet: bool) -> int:
+    """校验各 skill 的「关联 Skill」表：引用的名字必须是真实 skill（或显式标注）。
+
+    触发背景：`api-first-modular` 曾被写成 `api-first`、`code-debugger` 被写成 `debug`，
+    三镜像各自漂移，路由表指向不存在的 skill，属于一类“静默失效”缺陷。
+
+    约定（与 CONTRIBUTING.md 「关联 Skill 无悬空引用」一致）：
+      - 外部 skill：名字后加 `（外部）` / `(external)`，跳过存在性校验
+      - 非 skill 的沉淀库 / 产物：整个名字写成 `—（…，非 skill）` 或 `-`，跳过
+    """
+    checked = 0
+    mirrors = collect_mirror_skills([])
+    for platform, table in sorted(mirrors.items()):
+        for _name, path in sorted(table.items()):
+            text = read_text(path, [])
+            _fm, body = split_frontmatter(text)
+            m = re.search(r"^##\s*关联\s*Skill.*?$", body, re.M)
+            if not m:
+                continue
+            rest = body[m.end():]
+            stop = re.search(r"^##\s", rest, re.M)
+            if stop:
+                rest = rest[: stop.start()]
+            for line in rest.split("\n"):
+                s = line.strip()
+                if not s.startswith("|"):
+                    continue
+                cells = [c.strip() for c in s.strip("|").split("|")]
+                if len(cells) < 2:
+                    continue
+                relation, ref = cells[0], cells[1]
+                if relation == TABLE_HEADER_FIRST_CELL or set(relation) <= set("-: "):
+                    continue
+                if ref in MARKDOWN_ROW_NOISE or "（外部）" in ref or "(外部)" in ref:
+                    continue
+                checked += 1
+                for target in re.split(r"\s*/\s*", ref):
+                    target = target.strip()
+                    if not target or target in MARKDOWN_ROW_NOISE:
+                        continue
+                    if not NAME_RE.match(target) and not target.startswith("scrna-"):
+                        # 含中文 → 作者已用自然语言描述非 skill 目标，视为声明，跳过
+                        continue
+                    if target not in all_names:
+                        issues.append(Issue(
+                            "ERROR", rel(path), "dangling-skill-ref",
+                            f"「关联 Skill」表引用了不存在的 skill：{target!r}"
+                            "（若为外部 skill 请加“（外部）”；若为沉淀库/产物请写“—（…，非 skill）”）",
+                        ))
+    if not quiet:
+        print(f"  [skill-refs] 校验「关联 Skill」引用：{checked} 条")
+    return checked
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="CodeForge skill 元数据 / 格式合规校验")
     parser.add_argument("--quiet", action="store_true", help="仅输出问题")
@@ -403,6 +463,8 @@ def main() -> int:
     total_skills, drift = check_mirrors(issues, args.quiet)
     cmd_count = check_claude_commands(issues, args.quiet)
     text_count = check_text_hygiene(issues, args.quiet)
+    all_skill_names = set(mirrors["codex"]) | set(mirrors["gemini"]) | set(mirrors["claude"])
+    ref_count = check_skill_refs(issues, all_skill_names, args.quiet)
 
     errors = [i for i in issues if i.level == "ERROR"]
     warns = [i for i in issues if i.level == "WARN"]
@@ -412,6 +474,7 @@ def main() -> int:
             "skills_scanned": skill_count,
             "mirror_skills": total_skills,
             "commands_scanned": cmd_count,
+            "skill_refs_checked": ref_count,
             "text_files_scanned": text_count,
             "errors": [i.as_dict() for i in errors],
             "warnings": [i.as_dict() for i in warns],
@@ -428,7 +491,7 @@ def main() -> int:
             print()
             print("=" * 62)
             print(f"  skill 检查 {skill_count} 个 | command {cmd_count} 个 | 文本文件 {text_count} 个")
-            print(f"  三镜像正文漂移 {drift}/{total_skills} 个（WARN，历史技术债）")
+            print(f"  关联 Skill 引用 {ref_count} 条；三镜像正文漂移 {drift}/{total_skills} 个（WARN，历史技术债）")
             if not errors:
                 print(f"  ✅ 无阻塞问题（{len(warns)} 条提示）")
             else:

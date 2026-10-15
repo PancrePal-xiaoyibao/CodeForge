@@ -232,6 +232,7 @@ Fork → 特性分支 → 修改**三镜像**（`.claude/`、`.codex/`、`.gemin
 - [ ] **跑一遍元数据校验** — `python3 scripts/validate-skills.py`（CI 同款门禁，见下方说明）
 - [ ] **关联 Skill 段** — 若改动影响 skill 间路由，更新相关关联段并保证双向一致
 - [ ] **无死链** — `scripts/` `references/` 引用路径真实存在
+- [ ] **关联 Skill 无悬空引用** — 「关联 Skill」表里写的名字必须是真实 skill（三镜像之一存在）；外部 skill 标注 `（外部）`，非 skill 的沉淀库写 `—（…，非 skill）`
 - [ ] **入口文档同步** — `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` 三个入口的路由表 / 命令列表都要更
 - [ ] **本地验证** — 在至少一个平台实际跑一遍该 skill
 

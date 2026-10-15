@@ -147,5 +147,5 @@ confidence: high|medium|low
 | 关系 | Skill | 场景 |
 |------|-------|------|
 | 补充 | loop-engineer | loop-engineer 做多 skill 编排设计；本 skill 负责发现机会与复盘表现 |
-| 喂给 | skill 创建/治理流程 | 候选规格交接 |
+| 喂给 | skill-governor（外部） | 候选规格交接（skill 创建 / 治理流程） |
 | 配合 | deep-research | 工作模式证据调查 |

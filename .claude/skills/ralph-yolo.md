@@ -620,4 +620,4 @@ git checkout -b ralph/feature-name
 | 可调用 | nodejs-npm-auto-release | 全部故事完成后发布 |
 | 被调用 | ai-spec | 主调度路由到自动开发(YOLO) |
 | 被调用 | prd | PRD 完成后启动 YOLO |
-| 被调用 | api-first | API 设计完成进入 YOLO 实现 |
+| 被调用 | api-first-modular | API 设计完成进入 YOLO 实现 |

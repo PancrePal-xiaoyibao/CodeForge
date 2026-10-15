@@ -406,5 +406,5 @@ US-002: 优化认证体验  ← 太模糊，不可验证
 | 关系 | Skill | 场景 |
 |------|-------|------|
 | 可调用 | ralph / ralph-yolo | API 开发完成后进入自动实现循环 |
-| 可调用 | debug | API 层出现 bug 时 |
+| 可调用 | code-debugger | API 层出现 bug 时 |
 | 被调用 | ai-spec | 主调度分诊为架构任务后 |

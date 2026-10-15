@@ -109,6 +109,9 @@ RETURN f.qualified_name, f.transitive_loop_depth ORDER BY f.transitive_loop_dept
 5. `direction="outbound"` 会漏跨服务调用方 — 用 `direction="both"`。
 6. `semantic_query` 必须是**关键词数组**，不是单个字符串。
 7. 文本/配置/非代码文件（YAML、Markdown、日志）不适用图谱 — 用 Grep/Glob/Read。
+8. **图谱盲区：文件格式 / 编码 / 元数据 / 配置类问题。** 这类文件在图谱里只作为 Module 节点存在、无函数级边，
+   图谱帮不上忙 —— 直接读实际文件、以字节日志（`file` / `xxd` / `head -c3`）为准。
+   典型：frontmatter 缺失、BOM、CRLF、YAML 键合法性、行尾。**codebase 图谱优先 ≠ 一切场景都走图谱。**
 
 ## 关联 Skill
 

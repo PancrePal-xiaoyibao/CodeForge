@@ -860,6 +860,6 @@ python scripts/log_skill_call.py export [output_path]
 
 | 关系 | Skill | 场景 |
 |------|-------|------|
-| 可调用 | scrna-celltype-annotation | marker 分析完成需要细胞注释 |
+| 可调用 | scrna-celltype-annotation（外部） | marker 分析完成需要细胞注释 |
 | 可调用 | deep-research | 实验结果需要文献验证(W3) |
-| 被调用 | academic-orchestrator | 实验分析阶段 |
+| 被调用 | academic-orchestrator（外部） | 实验分析阶段 |

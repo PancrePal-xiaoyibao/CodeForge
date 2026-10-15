@@ -374,5 +374,5 @@ description: 智能代码调试与增量开发系统 - 基于深度上下文理�
 | 被调用 | ai-spec | 主调度分诊为 bug 修复 |
 | 被调用 | code-review | 审查发现 bug 需要修复时 |
 | 被调用 | ralph / ralph-yolo | 自动开发中遇到错误 |
-| 被调用 | api-first | API 层出现 bug 调试 |
+| 被调用 | api-first-modular | API 层出现 bug 调试 |
 | 被调用 | ux-experience-audit | 体验审计发现功能性 bug |
